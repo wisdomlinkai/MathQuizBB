@@ -1,0 +1,29 @@
+{
+  "Comment": "Create alias record for game.eduq-ai.com pointing to CloudFront",
+  "Changes": [
+    {
+      "Action": "CREATE",
+      "ResourceRecordSet": {
+        "Name": "game.eduq-ai.com.",
+        "Type": "A",
+        "AliasTarget": {
+          "HostedZoneId": "Z2FDTNDATAQYW2",
+          "DNSName": "d2n4g4v431p1t1.cloudfront.net.",
+          "EvaluateTargetHealth": false
+        }
+      }
+    },
+    {
+      "Action": "CREATE",
+      "ResourceRecordSet": {
+        "Name": "game.eduq-ai.com.",
+        "Type": "AAAA",
+        "AliasTarget": {
+          "HostedZoneId": "Z2FDTNDATAQYW2",
+          "DNSName": "d2n4g4v431p1t1.cloudfront.net.",
+          "EvaluateTargetHealth": false
+        }
+      }
+    }
+  ]
+}

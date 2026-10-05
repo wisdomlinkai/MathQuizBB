@@ -1,0 +1,11 @@
+{
+  "Changes": [{
+    "Action": "CREATE",
+    "ResourceRecordSet": {
+      "Name": "_491af0354f80669bcb86b0ad7787b2f8.game.eduq-ai.com.",
+      "Type": "CNAME",
+      "TTL": 300,
+      "ResourceRecords": [{"Value": "_470ec4724ce8ad6bbe97600955932b63.wzccmgtwzk.acm-validations.aws."}]
+    }
+  }]
+}

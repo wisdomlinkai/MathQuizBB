@@ -1,0 +1,7 @@
+{
+  "Name": "game-eduq-ai-OAC",
+  "Description": "OAC for game.eduq-ai.com",
+  "SigningProtocol": "sigv4",
+  "SigningBehavior": "always",
+  "OriginAccessControlOriginType": "s3"
+}

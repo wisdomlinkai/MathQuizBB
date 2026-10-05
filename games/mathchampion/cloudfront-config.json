@@ -1,0 +1,57 @@
+{
+  "CallerReference": "game-eduq-ai-cloudfront-2026",
+  "Aliases": {
+    "Quantity": 1,
+    "Items": ["game.eduq-ai.com"]
+  },
+  "DefaultRootObject": "index.html",
+  "Comment": "Math Quiz Game - game.eduq-ai.com",
+  "Enabled": true,
+  "PriceClass": "PriceClass_100",
+  "ViewerCertificate": {
+    "ACMCertificateArn": "arn:aws:acm:us-east-1:240966654973:certificate/fd808d66-a428-412c-b56b-05cadfc9abfb",
+    "SSLSupportMethod": "sni-only",
+    "MinimumProtocolVersion": "TLSv1.2_2021"
+  },
+  "Origins": {
+    "Quantity": 1,
+    "Items": [
+      {
+        "Id": "S3-game.eduq-ai.com",
+        "DomainName": "game.eduq-ai.com.s3.ap-southeast-1.amazonaws.com",
+        "S3OriginConfig": {
+          "OriginAccessIdentity": ""
+        }
+      }
+    ]
+  },
+  "DefaultCacheBehavior": {
+    "TargetOriginId": "S3-game.eduq-ai.com",
+    "ViewerProtocolPolicy": "redirect-to-https",
+    "AllowedMethods": {
+      "Quantity": 2,
+      "Items": ["GET", "HEAD"]
+    },
+    "ForwardedValues": {
+      "QueryString": false,
+      "Cookies": {
+        "Forward": "none"
+      }
+    },
+    "MinTTL": 0,
+    "DefaultTTL": 86400,
+    "MaxTTL": 31536000,
+    "Compress": true
+  },
+  "CustomErrorResponses": {
+    "Quantity": 1,
+    "Items": [
+      {
+        "ErrorCode": 404,
+        "ResponsePagePath": "/index.html",
+        "ResponseCode": "200",
+        "ErrorCachingMinTTL": 300
+      }
+    ]
+  }
+}
