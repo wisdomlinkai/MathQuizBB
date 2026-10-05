@@ -1,0 +1,13 @@
+{
+  "Changes": [
+    {
+      "Action": "CREATE",
+      "ResourceRecordSet": {
+        "Name": "mathchampion.game.eduq-ai.com.",
+        "Type": "CNAME",
+        "TTL": 300,
+        "ResourceRecords": [{"Value": "d36jzlgglfsc2n.cloudfront.net"}]
+      }
+    }
+  ]
+}
