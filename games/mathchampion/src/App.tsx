@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import { HomeScreen } from '@/screens/HomeScreen';
 import { StageSelectScreen } from '@/screens/StageSelectScreen';
 import { GameScreen } from '@/screens/GameScreen';
@@ -17,19 +17,15 @@ import {
   type RoundOutcome,
 } from '@/storage';
 import { STAGES, generateDailyRound } from '@/game';
-import type { PlayerProfile, StageId, Difficulty, RoundResult, LeaderboardEntry, PlayerStats } from '@/types';
-
-// Auth types (will be replaced with Cognito integration later)
-interface AuthUser {
-  userId: string;
-  email: string;
-  name: string;
-}
+import { getAuthUser, signIn, signOut as amplifySignOut } from '@/auth';
+import * as api from '@/api';
+import type { PlayerProfile, StageId, Difficulty, RoundResult, LeaderboardEntry, PlayerStats, User } from '@/types';
 
 interface AuthState {
   isAuthenticated: boolean;
-  user: AuthUser | null;
+  user: User | null;
   guestId: string;
+  isLoading: boolean;
 }
 
 type Screen = 'home' | 'stages' | 'game' | 'results' | 'leaderboard' | 'badges';
@@ -52,9 +48,8 @@ export default function App() {
   const [roundOutcome, setRoundOutcome] = useState<RoundOutcome | null>(null);
   const [prevXp, setPrevXp] = useState(0);
 
-  // Auth state (placeholder - will be connected to Cognito)
+  // Auth state with AWS Cognito
   const [auth, setAuth] = useState<AuthState>(() => {
-    // Check for stored guest ID
     let guestId = localStorage.getItem('mathChampions_guestId');
     if (!guestId) {
       guestId = crypto.randomUUID();
@@ -64,31 +59,96 @@ export default function App() {
       isAuthenticated: false,
       user: null,
       guestId,
+      isLoading: true,
     };
   });
 
-  // Login handler - redirects to EduQ AI login (placeholder)
-  const handleLogin = useCallback(() => {
-    // TODO: Replace with actual Cognito redirect
-    // For now, redirect to EduQ AI login page
-    const redirectUrl = encodeURIComponent(window.location.origin);
-    window.location.href = `https://eduq-ai.com/login?redirect=${redirectUrl}`;
+  // Check auth state on mount and handle OAuth callback
+  useEffect(() => {
+    async function checkAuth() {
+      try {
+        const user = await getAuthUser();
+        if (user) {
+          setAuth((prev) => ({
+            ...prev,
+            isAuthenticated: true,
+            user: {
+              id: user.userId,
+              email: user.email,
+              name: user.name,
+            },
+            isLoading: false,
+          }));
+        } else {
+          setAuth((prev) => ({ ...prev, isLoading: false }));
+        }
+      } catch (error) {
+        console.error('Auth check failed:', error);
+        setAuth((prev) => ({ ...prev, isLoading: false }));
+      }
+    }
+
+    checkAuth();
+  }, []);
+
+  // Sync local stats with backend when authenticated
+  useEffect(() => {
+    async function syncWithBackend() {
+      if (!auth.isAuthenticated) return;
+
+      try {
+        // Fetch user progress from backend
+        const progressResult = await api.getUserProgress();
+        if (progressResult.success && progressResult.data) {
+          // Merge backend progress with local progress
+          // Local progress takes precedence for offline play
+          // TODO: Implement sync logic
+          void getProgress(); // Placeholder for sync logic
+        }
+
+        // Fetch leaderboard from backend
+        const leaderboardResult = await api.getLeaderboard('all', 20);
+        if (leaderboardResult.success && leaderboardResult.data) {
+          // Merge with local leaderboard
+          // TODO: Implement merge and dedupe logic
+          void getLeaderboard(); // Placeholder for merge logic
+        }
+      } catch (error) {
+        console.error('Backend sync failed:', error);
+      }
+    }
+
+    syncWithBackend();
+  }, [auth.isAuthenticated]);
+
+  // Login handler - uses Cognito hosted UI
+  const handleLogin = useCallback(async () => {
+    try {
+      await signIn();
+    } catch (error) {
+      console.error('Login failed:', error);
+    }
   }, []);
 
   // Logout handler
-  const handleLogout = useCallback(() => {
-    setAuth({
-      isAuthenticated: false,
-      user: null,
-      guestId: crypto.randomUUID(),
-    });
-    // Generate new guest ID
-    localStorage.setItem('mathChampions_guestId', crypto.randomUUID());
+  const handleLogout = useCallback(async () => {
+    try {
+      await amplifySignOut();
+      setAuth({
+        isAuthenticated: false,
+        user: null,
+        guestId: crypto.randomUUID(),
+        isLoading: false,
+      });
+      localStorage.setItem('mathChampions_guestId', crypto.randomUUID());
+    } catch (error) {
+      console.error('Logout failed:', error);
+    }
   }, []);
 
   // View profile handler
   const handleViewProfile = useCallback(() => {
-    // TODO: Navigate to EduQ AI profile page
+    // Navigate to EduQ AI profile page
     window.location.href = 'https://eduq-ai.com/profile';
   }, []);
 
@@ -109,12 +169,12 @@ export default function App() {
   }, []);
 
   const handleGameComplete = useCallback(
-    (result: RoundResult) => {
+    async (result: RoundResult) => {
       const prevProgress = getProgress();
       const prevHigh = prevProgress.stages[result.stageId].highScore;
       const isNew = result.score > prevHigh;
 
-      const newProgress = updateStageProgress(result.stageId, result.stars, result.score);
+      const newProgress = updateStageProgress(result.stageId, result.stars, result.score, result.difficulty);
       setProgress(newProgress);
 
       const prevStats = getStats();
@@ -136,11 +196,37 @@ export default function App() {
       const newBoard = addToLeaderboard(entry);
       setLeaderboard(newBoard);
 
+      // Sync with AWS backend if authenticated
+      if (auth.isAuthenticated) {
+        try {
+          // Submit score to backend
+          await api.submitScore(
+            result.stageId,
+            result.score,
+            result.timeInSeconds || 0
+          );
+
+          // Update progress on backend
+          await api.updateUserProgress(
+            result.stageId,
+            result.stars >= 1,
+            result.score
+          );
+
+          // Check for achievements
+          outcome.newBadges.forEach(async (badge) => {
+            await api.unlockAchievement(badge);
+          });
+        } catch (error) {
+          console.error('Failed to sync with backend:', error);
+        }
+      }
+
       setLastResult(result);
       setIsNewHighScore(isNew);
       setScreen('results');
     },
-    [player.name, player.avatar],
+    [player.name, player.avatar, auth.isAuthenticated],
   );
 
   const handleRetry = useCallback(() => {

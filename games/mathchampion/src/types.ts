@@ -49,6 +49,7 @@ export interface RoundResult {
   xpEarned: number;
   answers: AnswerRecord[];
   isDaily: boolean;
+  timeInSeconds?: number; // Total time taken in seconds
 }
 
 export interface LeaderboardEntry {
@@ -67,9 +68,17 @@ export interface PlayerProfile {
 }
 
 export interface StageProgress {
-  unlocked: boolean;
+  unlocked: boolean; // Keep for backward compatibility
   bestStars: number;
   highScore: number;
+  // Per-difficulty unlock status
+  easyUnlocked: boolean;
+  mediumUnlocked: boolean;
+  hardUnlocked: boolean;
+  // Per-difficulty best scores
+  easyBestStars: number;
+  mediumBestStars: number;
+  hardBestStars: number;
 }
 
 export interface GameProgress {
@@ -99,7 +108,7 @@ export interface BadgeDef {
 
 // Auth types (for Cognito integration)
 export interface User {
-  userId: string;
+  id: string;
   email: string;
   name: string;
 }

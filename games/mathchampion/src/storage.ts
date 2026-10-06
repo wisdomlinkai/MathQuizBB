@@ -3,6 +3,7 @@ import type {
   GameProgress,
   LeaderboardEntry,
   StageId,
+  Difficulty,
   PlayerStats,
   RoundResult,
 } from '@/types';
@@ -47,26 +48,115 @@ export function savePlayer(player: PlayerProfile): void {
 export function getProgress(): GameProgress {
   const defaultProgress: GameProgress = {
     stages: {
-      addition: { unlocked: true, bestStars: 0, highScore: 0 },
-      subtraction: { unlocked: false, bestStars: 0, highScore: 0 },
-      mixed: { unlocked: false, bestStars: 0, highScore: 0 },
-      multiplication: { unlocked: false, bestStars: 0, highScore: 0 },
-      division: { unlocked: false, bestStars: 0, highScore: 0 },
-      mixed_mul: { unlocked: false, bestStars: 0, highScore: 0 },
+      addition: { 
+        unlocked: true, 
+        bestStars: 0, 
+        highScore: 0,
+        easyUnlocked: true,
+        mediumUnlocked: false,
+        hardUnlocked: false,
+        easyBestStars: 0,
+        mediumBestStars: 0,
+        hardBestStars: 0,
+      },
+      subtraction: { 
+        unlocked: true, 
+        bestStars: 0, 
+        highScore: 0,
+        easyUnlocked: true,
+        mediumUnlocked: false,
+        hardUnlocked: false,
+        easyBestStars: 0,
+        mediumBestStars: 0,
+        hardBestStars: 0,
+      },
+      mixed: { 
+        unlocked: true, 
+        bestStars: 0, 
+        highScore: 0,
+        easyUnlocked: true,
+        mediumUnlocked: false,
+        hardUnlocked: false,
+        easyBestStars: 0,
+        mediumBestStars: 0,
+        hardBestStars: 0,
+      },
+      multiplication: { 
+        unlocked: true, 
+        bestStars: 0, 
+        highScore: 0,
+        easyUnlocked: true,
+        mediumUnlocked: false,
+        hardUnlocked: false,
+        easyBestStars: 0,
+        mediumBestStars: 0,
+        hardBestStars: 0,
+      },
+      division: { 
+        unlocked: true, 
+        bestStars: 0, 
+        highScore: 0,
+        easyUnlocked: true,
+        mediumUnlocked: false,
+        hardUnlocked: false,
+        easyBestStars: 0,
+        mediumBestStars: 0,
+        hardBestStars: 0,
+      },
+      mixed_mul: { 
+        unlocked: true, 
+        bestStars: 0, 
+        highScore: 0,
+        easyUnlocked: true,
+        mediumUnlocked: false,
+        hardUnlocked: false,
+        easyBestStars: 0,
+        mediumBestStars: 0,
+        hardBestStars: 0,
+      },
     },
   };
+  
   const progress = safeGet<GameProgress>(KEYS.progress, defaultProgress);
+  
+  // Ensure all stages have the new fields (migration)
   for (const stage of STAGES) {
     if (!progress.stages[stage.id]) {
-      progress.stages[stage.id] = { unlocked: false, bestStars: 0, highScore: 0 };
+      progress.stages[stage.id] = { 
+        unlocked: true, 
+        bestStars: 0, 
+        highScore: 0,
+        easyUnlocked: true,
+        mediumUnlocked: false,
+        hardUnlocked: false,
+        easyBestStars: 0,
+        mediumBestStars: 0,
+        hardBestStars: 0,
+      };
+    }
+    
+    // Migrate old data to new format if needed
+    const s = progress.stages[stage.id];
+    if (s.easyUnlocked === undefined) {
+      s.easyUnlocked = true;
+    }
+    if (s.mediumUnlocked === undefined) {
+      s.mediumUnlocked = false;
+    }
+    if (s.hardUnlocked === undefined) {
+      s.hardUnlocked = false;
+    }
+    if (s.easyBestStars === undefined) {
+      s.easyBestStars = 0;
+    }
+    if (s.mediumBestStars === undefined) {
+      s.mediumBestStars = 0;
+    }
+    if (s.hardBestStars === undefined) {
+      s.hardBestStars = 0;
     }
   }
-  progress.stages[STAGES[0].id].unlocked = true;
-  for (let i = 0; i < STAGES.length - 1; i++) {
-    if (progress.stages[STAGES[i].id].bestStars >= 1) {
-      progress.stages[STAGES[i + 1].id].unlocked = true;
-    }
-  }
+  
   return progress;
 }
 
@@ -77,18 +167,31 @@ export function saveProgress(progress: GameProgress): void {
 export function updateStageProgress(
   stageId: StageId,
   stars: number,
-  score: number
+  score: number,
+  difficulty: Difficulty
 ): GameProgress {
   const progress = getProgress();
   const stage = progress.stages[stageId];
 
+  // Update overall best stars and score
   stage.bestStars = Math.max(stage.bestStars, stars);
   stage.highScore = Math.max(stage.highScore, score);
-
-  const stageIndex = STAGES.findIndex((s) => s.id === stageId);
-  if (stars >= 1 && stageIndex < STAGES.length - 1) {
-    const nextId = STAGES[stageIndex + 1].id;
-    progress.stages[nextId].unlocked = true;
+  
+  // Update difficulty-specific best stars
+  if (difficulty === 'easy') {
+    stage.easyBestStars = Math.max(stage.easyBestStars, stars);
+    // Unlock medium after getting 1+ star on easy
+    if (stars >= 1) {
+      stage.mediumUnlocked = true;
+    }
+  } else if (difficulty === 'medium') {
+    stage.mediumBestStars = Math.max(stage.mediumBestStars, stars);
+    // Unlock hard after getting 1+ star on medium
+    if (stars >= 1) {
+      stage.hardUnlocked = true;
+    }
+  } else if (difficulty === 'hard') {
+    stage.hardBestStars = Math.max(stage.hardBestStars, stars);
   }
 
   saveProgress(progress);
