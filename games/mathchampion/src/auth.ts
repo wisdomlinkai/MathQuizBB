@@ -66,9 +66,7 @@ export async function getAccessToken(): Promise<string | null> {
 
 // Sign in using Cognito hosted UI
 export async function signIn() {
-  await signInWithRedirect({
-    provider: 'COGNITO',
-  });
+  await signInWithRedirect();
 }
 
 // Sign out
