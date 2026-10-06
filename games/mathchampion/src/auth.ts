@@ -24,6 +24,10 @@ Amplify.configure({
       },
     },
   },
+}, {
+  Auth: {
+    disablePKCE: true,  // Disable PKCE for Cognito compatibility
+  },
 });
 
 export interface AuthUser {
