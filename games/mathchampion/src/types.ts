@@ -1,6 +1,26 @@
 export type Operation = '+' | '-' | '×' | '÷';
 
-export type StageId = 'addition' | 'subtraction' | 'mixed' | 'multiplication' | 'division' | 'mixed_mul';
+export type StageId = 
+  | 'addition' 
+  | 'subtraction' 
+  | 'mixed' 
+  | 'multiplication' 
+  | 'division' 
+  | 'mixed_mul'
+  | 'two_step'
+  | 'two_step_parens'
+  | 'three_step'
+  | 'three_step_parens'
+  | 'four_step';
+
+export type QuestionType = 'simple' | 'multi_step';
+
+export interface MultiStepQuestion {
+  expression: string;
+  answer: number;
+  steps: number;
+  hasParens: boolean;
+}
 
 export type Difficulty = 'easy' | 'medium' | 'hard';
 
@@ -12,6 +32,9 @@ export interface StageMeta {
   operations: Operation[];
   color: string;
   gradient: string;
+  // For multi-step stages
+  steps?: number;
+  hasParens?: boolean;
 }
 
 export interface DifficultyMeta {
@@ -28,6 +51,10 @@ export interface Question {
   b: number;
   op: Operation;
   answer: number;
+  // For multi-step questions
+  expression?: string;
+  steps?: number;
+  hasParens?: boolean;
 }
 
 export interface AnswerRecord {

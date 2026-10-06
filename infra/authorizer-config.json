@@ -1,0 +1,6 @@
+{
+  "name": "EduQ-Cognito-Authorizer",
+  "type": "COGNITO_USER_POOLS",
+  "providerARNs": ["arn:aws:cognito-idp:ap-southeast-1:240966654973:userpool/ap-southeast-1_GBHJD77aF"],
+  "identitySource": "method.request.header.Authorization"
+}

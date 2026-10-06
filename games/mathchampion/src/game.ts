@@ -65,6 +65,61 @@ export const STAGES: StageMeta[] = [
     color: 'cyan',
     gradient: 'from-cyan-300 to-cyan-500',
   },
+  {
+    id: 'two_step',
+    label: 'Two-Step',
+    labelZh: '兩步運算',
+    emoji: '🔢',
+    operations: ['+', '-', '×', '÷'],
+    color: 'purple',
+    gradient: 'from-purple-300 to-purple-500',
+    steps: 2,
+    hasParens: false,
+  },
+  {
+    id: 'two_step_parens',
+    label: 'Two-Step ( )',
+    labelZh: '兩步括號',
+    emoji: '📦',
+    operations: ['+', '-', '×', '÷'],
+    color: 'pink',
+    gradient: 'from-pink-300 to-pink-500',
+    steps: 2,
+    hasParens: true,
+  },
+  {
+    id: 'three_step',
+    label: 'Three-Step',
+    labelZh: '三步運算',
+    emoji: '🧮',
+    operations: ['+', '-', '×', '÷'],
+    color: 'indigo',
+    gradient: 'from-indigo-300 to-indigo-500',
+    steps: 3,
+    hasParens: false,
+  },
+  {
+    id: 'three_step_parens',
+    label: 'Three-Step ( )',
+    labelZh: '三步括號',
+    emoji: '🎯',
+    operations: ['+', '-', '×', '÷'],
+    color: 'rose',
+    gradient: 'from-rose-300 to-rose-500',
+    steps: 3,
+    hasParens: true,
+  },
+  {
+    id: 'four_step',
+    label: 'Four-Step',
+    labelZh: '四步運算',
+    emoji: '🎓',
+    operations: ['+', '-', '×', '÷'],
+    color: 'violet',
+    gradient: 'from-violet-300 to-violet-500',
+    steps: 4,
+    hasParens: true,
+  },
 ];
 
 export const DIFFICULTIES: DifficultyMeta[] = [
@@ -250,16 +305,187 @@ export function generateQuestion(operations: Operation[], maxDigits: number): Qu
   return { a, b, op, answer: op === '+' ? a + b : a - b };
 }
 
+// Generate multi-step questions
+export function generateMultiStepQuestion(
+  steps: number,
+  hasParens: boolean,
+  maxDigits: number
+): Question {
+  const operations: Operation[] = ['+', '-', '×', '÷'];
+  
+  // Generate numbers based on difficulty
+  const getNumber = () => {
+    if (maxDigits <= 1) return randInt(1, 9);
+    if (maxDigits === 2) return randInt(10, 50);
+    return randInt(10, 100);
+  };
+
+  // Generate a valid division (no remainders)
+  const generateDivision = () => {
+    const divisor = randInt(2, maxDigits <= 1 ? 9 : 12);
+    const quotient = getNumber();
+    return { dividend: divisor * quotient, divisor, quotient };
+  };
+
+  // Build expression step by step
+  const numbers: number[] = [];
+  const ops: Operation[] = [];
+  
+  // First number
+  numbers.push(getNumber());
+  
+  for (let i = 0; i < steps; i++) {
+    const op = operations[randInt(0, 3)];
+    ops.push(op);
+    
+    if (op === '÷') {
+      // Ensure clean division
+      const div = generateDivision();
+      numbers.push(div.divisor);
+    } else if (op === '×') {
+      numbers.push(randInt(2, maxDigits <= 1 ? 9 : 12));
+    } else {
+      numbers.push(getNumber());
+    }
+  }
+
+  // Build expression string
+  let expression = '';
+  
+  if (hasParens && steps >= 2) {
+    // Add parentheses in a strategic position
+    const parenPos = randInt(0, steps - 2);
+    
+    for (let i = 0; i < numbers.length; i++) {
+      if (i === parenPos) {
+        expression += '(';
+      }
+      expression += numbers[i].toString();
+      if (i === parenPos + 2) {
+        expression += ')';
+      }
+      if (i < ops.length) {
+        expression += ` ${ops[i]} `;
+      }
+    }
+  } else {
+    // No parentheses - standard order of operations
+    expression = numbers.map((n, i) => {
+      if (i < ops.length) {
+        return `${n} ${ops[i]}`;
+      }
+      return n.toString();
+    }).join(' ');
+  }
+
+  // Calculate answer (respecting order of operations and parentheses)
+  const answer = evaluateExpression(numbers, ops, hasParens ? 0 : -1);
+
+  return {
+    a: numbers[0],
+    b: numbers[1],
+    op: ops[0],
+    answer,
+    expression,
+    steps,
+    hasParens,
+  };
+}
+
+// Evaluate expression with order of operations
+function evaluateExpression(
+  numbers: number[],
+  ops: Operation[],
+  parenStart: number = -1
+): number {
+  // Create a copy to work with
+  const nums = [...numbers];
+  const operations = [...ops];
+  
+  // Handle parentheses first if present
+  if (parenStart >= 0 && nums.length >= 3) {
+    // Evaluate the parenthesized part first
+    const idx = parenStart;
+    const op1 = operations[idx];
+    const op2 = operations[idx + 1];
+    
+    // First operation inside parentheses
+    let innerResult: number;
+    if (op1 === '+') {
+      innerResult = nums[idx] + nums[idx + 1];
+    } else if (op1 === '-') {
+      innerResult = nums[idx] - nums[idx + 1];
+    } else if (op1 === '×') {
+      innerResult = nums[idx] * nums[idx + 1];
+    } else {
+      innerResult = Math.floor(nums[idx] / nums[idx + 1]);
+    }
+    
+    // Second operation with the result
+    if (op2 === '+') {
+      return innerResult + nums[idx + 2];
+    } else if (op2 === '-') {
+      return innerResult - nums[idx + 2];
+    } else if (op2 === '×') {
+      return innerResult * nums[idx + 2];
+    } else {
+      return Math.floor(innerResult / nums[idx + 2]);
+    }
+  }
+  
+  // Standard order of operations: × and ÷ first, then + and -
+  // First pass: handle × and ÷
+  let i = 0;
+  while (i < operations.length) {
+    if (operations[i] === '×' || operations[i] === '÷') {
+      const result = operations[i] === '×' 
+        ? nums[i] * nums[i + 1]
+        : Math.floor(nums[i] / nums[i + 1]);
+      
+      nums.splice(i, 2, result);
+      operations.splice(i, 1);
+    } else {
+      i++;
+    }
+  }
+  
+  // Second pass: handle + and -
+  let result = nums[0];
+  for (let j = 0; j < operations.length; j++) {
+    if (operations[j] === '+') {
+      result += nums[j + 1];
+    } else {
+      result -= nums[j + 1];
+    }
+  }
+  
+  return result;
+}
+
 export function generateRound(stageId: StageId, difficulty: Difficulty): Question[] {
   const stage = STAGES.find((s) => s.id === stageId)!;
   const diff = DIFFICULTIES.find((d) => d.id === difficulty)!;
   const questions: Question[] = [];
   const seen = new Set<string>();
 
+  // Check if this is a multi-step stage
+  const isMultiStep = stage.steps !== undefined && stage.steps >= 2;
+
   let attempts = 0;
   while (questions.length < QUESTIONS_PER_ROUND && attempts < 200) {
-    const q = generateQuestion(stage.operations, diff.maxDigits);
-    const key = `${q.a}${q.op}${q.b}`;
+    let q: Question;
+    
+    if (isMultiStep) {
+      q = generateMultiStepQuestion(
+        stage.steps!,
+        stage.hasParens ?? false,
+        diff.maxDigits
+      );
+    } else {
+      q = generateQuestion(stage.operations, diff.maxDigits);
+    }
+    
+    const key = q.expression ?? `${q.a}${q.op}${q.b}`;
     if (!seen.has(key)) {
       seen.add(key);
       questions.push(q);
@@ -268,7 +494,15 @@ export function generateRound(stageId: StageId, difficulty: Difficulty): Questio
   }
 
   while (questions.length < QUESTIONS_PER_ROUND) {
-    questions.push(generateQuestion(stage.operations, diff.maxDigits));
+    if (isMultiStep) {
+      questions.push(generateMultiStepQuestion(
+        stage.steps!,
+        stage.hasParens ?? false,
+        diff.maxDigits
+      ));
+    } else {
+      questions.push(generateQuestion(stage.operations, diff.maxDigits));
+    }
   }
 
   return questions;

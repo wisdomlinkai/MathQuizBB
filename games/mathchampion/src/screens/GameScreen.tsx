@@ -272,15 +272,30 @@ export function GameScreen({
           <div className={`font-display font-extrabold text-5xl sm:text-6xl flex items-center gap-3 flex-wrap justify-center ${
             feedback === 'correct' ? 'text-white' : feedback === 'wrong' ? 'text-white' : 'text-sky-800'
           }`}>
-            <span>{currentQuestion.a}</span>
-            <span>{currentQuestion.op}</span>
-            <span>{currentQuestion.b}</span>
-            <span className={feedback === 'none' ? 'text-sky-300' : 'text-white/70'}>=</span>
-            <span className={`min-w-[2ch] text-center ${
-              feedback === 'none' ? 'text-sky-400' : 'text-white'
-            }`}>
-              {answer || '?'}
-            </span>
+            {/* Multi-step expression or simple question */}
+            {currentQuestion.expression ? (
+              <>
+                <span className="text-3xl sm:text-4xl">{currentQuestion.expression}</span>
+                <span className={feedback === 'none' ? 'text-sky-300' : 'text-white/70'}>=</span>
+                <span className={`min-w-[2ch] text-center ${
+                  feedback === 'none' ? 'text-sky-400' : 'text-white'
+                }`}>
+                  {answer || '?'}
+                </span>
+              </>
+            ) : (
+              <>
+                <span>{currentQuestion.a}</span>
+                <span>{currentQuestion.op}</span>
+                <span>{currentQuestion.b}</span>
+                <span className={feedback === 'none' ? 'text-sky-300' : 'text-white/70'}>=</span>
+                <span className={`min-w-[2ch] text-center ${
+                  feedback === 'none' ? 'text-sky-400' : 'text-white'
+                }`}>
+                  {answer || '?'}
+                </span>
+              </>
+            )}
           </div>
 
           {/* Feedback message */}
