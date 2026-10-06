@@ -261,161 +261,309 @@ export function generateQuestion(operations: Operation[], maxDigits: number): Qu
   return { a, b, op, answer: op === '+' ? a + b : a - b };
 }
 
-// Generate multi-step questions
+// Generate multi-step questions with no negative results
 export function generateMultiStepQuestion(
   steps: number,
   hasParens: boolean,
   maxDigits: number
 ): Question {
-  const operations: Operation[] = ['+', '-', '×', '÷'];
+  // Generate a valid expression by building it from the answer
+  // This ensures no negative intermediate or final results
   
-  // Generate numbers based on difficulty
-  const getNumber = () => {
-    if (maxDigits <= 1) return randInt(1, 9);
-    if (maxDigits === 2) return randInt(10, 50);
-    return randInt(10, 100);
+  const getMax = () => {
+    if (maxDigits <= 1) return 9;
+    if (maxDigits === 2) return 50;
+    return 100;
   };
-
-  // Generate a valid division (no remainders)
-  const generateDivision = () => {
-    const divisor = randInt(2, maxDigits <= 1 ? 9 : 12);
-    const quotient = getNumber();
-    return { dividend: divisor * quotient, divisor, quotient };
-  };
-
-  // Build expression step by step
-  const numbers: number[] = [];
-  const ops: Operation[] = [];
   
-  // First number
-  numbers.push(getNumber());
+  const max = getMax();
   
-  for (let i = 0; i < steps; i++) {
-    const op = operations[randInt(0, 3)];
-    ops.push(op);
-    
-    if (op === '÷') {
-      // Ensure clean division
-      const div = generateDivision();
-      numbers.push(div.divisor);
-    } else if (op === '×') {
-      numbers.push(randInt(2, maxDigits <= 1 ? 9 : 12));
-    } else {
-      numbers.push(getNumber());
-    }
-  }
-
-  // Build expression string
-  let expression = '';
+  // For simplicity, generate specific patterns that are guaranteed to be valid
+  // Pattern types:
+  // 1. a + b × c (order of operations)
+  // 2. a × b + c
+  // 3. (a + b) × c (with parentheses)
+  // 4. a × (b + c)
+  // 5. a + b - c (ensuring a + b >= c)
+  // etc.
   
-  if (hasParens && steps >= 2) {
-    // Add parentheses in a strategic position
-    const parenPos = randInt(0, steps - 2);
-    
-    for (let i = 0; i < numbers.length; i++) {
-      if (i === parenPos) {
-        expression += '(';
-      }
-      expression += numbers[i].toString();
-      if (i === parenPos + 2) {
-        expression += ')';
-      }
-      if (i < ops.length) {
-        expression += ` ${ops[i]} `;
-      }
-    }
+  if (steps === 2) {
+    return generateTwoStepQuestion(hasParens, max);
+  } else if (steps === 3) {
+    return generateThreeStepQuestion(hasParens, max);
   } else {
-    // No parentheses - standard order of operations
-    expression = numbers.map((n, i) => {
-      if (i < ops.length) {
-        return `${n} ${ops[i]}`;
-      }
-      return n.toString();
-    }).join(' ');
+    return generateFourStepQuestion(max);
   }
+}
 
-  // Calculate answer (respecting order of operations and parentheses)
-  const answer = evaluateExpression(numbers, ops, hasParens ? 0 : -1);
-
+function generateTwoStepQuestion(hasParens: boolean, max: number): Question {
+  const patterns = hasParens ? [
+    () => {
+      // (a + b) × c
+      const a = randInt(1, Math.floor(max / 3));
+      const b = randInt(1, Math.floor(max / 3));
+      const c = randInt(2, 9);
+      return {
+        expression: `(${a} + ${b}) × ${c}`,
+        answer: (a + b) * c,
+      };
+    },
+    () => {
+      // (a - b) × c, ensuring a > b
+      const b = randInt(1, Math.floor(max / 4));
+      const a = randInt(b + 1, b + Math.floor(max / 4));
+      const c = randInt(2, 9);
+      return {
+        expression: `(${a} - ${b}) × ${c}`,
+        answer: (a - b) * c,
+      };
+    },
+    () => {
+      // a × (b + c)
+      const a = randInt(2, 9);
+      const b = randInt(1, Math.floor(max / (a * 2)));
+      const c = randInt(1, Math.floor(max / (a * 2)));
+      return {
+        expression: `${a} × (${b} + ${c})`,
+        answer: a * (b + c),
+      };
+    },
+    () => {
+      // (a + b) ÷ c, ensuring (a + b) is divisible by c
+      const c = randInt(2, 9);
+      const sum = c * randInt(2, Math.floor(max / c));
+      const a = randInt(1, sum - 1);
+      const b = sum - a;
+      return {
+        expression: `(${a} + ${b}) ÷ ${c}`,
+        answer: sum / c,
+      };
+    },
+  ] : [
+    () => {
+      // a + b × c (order of operations: multiply first)
+      const b = randInt(2, 9);
+      const c = randInt(2, 9);
+      const a = randInt(1, max - b * c);
+      return {
+        expression: `${a} + ${b} × ${c}`,
+        answer: a + b * c,
+      };
+    },
+    () => {
+      // a × b + c
+      const a = randInt(2, 9);
+      const b = randInt(2, Math.floor(max / a));
+      const c = randInt(1, max - a * b);
+      return {
+        expression: `${a} × ${b} + ${c}`,
+        answer: a * b + c,
+      };
+    },
+    () => {
+      // a × b - c, ensuring a × b > c
+      const a = randInt(2, 9);
+      const b = randInt(2, Math.floor(max / a));
+      const c = randInt(1, a * b - 1);
+      return {
+        expression: `${a} × ${b} - ${c}`,
+        answer: a * b - c,
+      };
+    },
+    () => {
+      // a + b - c, ensuring a + b > c
+      const a = randInt(1, Math.floor(max / 2));
+      const b = randInt(1, Math.floor(max / 2));
+      const c = randInt(1, a + b - 1);
+      return {
+        expression: `${a} + ${b} - ${c}`,
+        answer: a + b - c,
+      };
+    },
+    () => {
+      // a ÷ b + c, ensuring a is divisible by b
+      const b = randInt(2, 9);
+      const quotient = randInt(1, Math.floor(max / b));
+      const a = b * quotient;
+      const c = randInt(1, max - quotient);
+      return {
+        expression: `${a} ÷ ${b} + ${c}`,
+        answer: quotient + c,
+      };
+    },
+  ];
+  
+  const pattern = patterns[randInt(0, patterns.length - 1)]();
+  
   return {
-    a: numbers[0],
-    b: numbers[1],
-    op: ops[0],
-    answer,
-    expression,
-    steps,
+    a: 0,
+    b: 0,
+    op: '+',
+    answer: pattern.answer,
+    expression: pattern.expression,
+    steps: 2,
     hasParens,
   };
 }
 
-// Evaluate expression with order of operations
-function evaluateExpression(
-  numbers: number[],
-  ops: Operation[],
-  parenStart: number = -1
-): number {
-  // Create a copy to work with
-  const nums = [...numbers];
-  const operations = [...ops];
+function generateThreeStepQuestion(hasParens: boolean, max: number): Question {
+  const patterns = hasParens ? [
+    () => {
+      // (a + b) × c + d
+      const a = randInt(1, Math.floor(max / 4));
+      const b = randInt(1, Math.floor(max / 4));
+      const c = randInt(2, 6);
+      const d = randInt(1, max - (a + b) * c);
+      return {
+        expression: `(${a} + ${b}) × ${c} + ${d}`,
+        answer: (a + b) * c + d,
+      };
+    },
+    () => {
+      // a × (b + c) - d, ensuring result > 0
+      const a = randInt(2, 6);
+      const b = randInt(1, Math.floor(max / (a * 2)));
+      const c = randInt(1, Math.floor(max / (a * 2)));
+      const product = a * (b + c);
+      const d = randInt(1, Math.min(product - 1, max));
+      return {
+        expression: `${a} × (${b} + ${c}) - ${d}`,
+        answer: product - d,
+      };
+    },
+    () => {
+      // (a - b) × c + d, ensuring a > b
+      const b = randInt(1, Math.floor(max / 6));
+      const a = randInt(b + 1, b + Math.floor(max / 6));
+      const c = randInt(2, 6);
+      const d = randInt(1, max);
+      return {
+        expression: `(${a} - ${b}) × ${c} + ${d}`,
+        answer: (a - b) * c + d,
+      };
+    },
+  ] : [
+    () => {
+      // a + b × c + d (multiply first)
+      const b = randInt(2, 6);
+      const c = randInt(2, Math.floor(max / b));
+      const product = b * c;
+      const a = randInt(1, Math.floor((max - product) / 2));
+      const d = randInt(1, max - product - a);
+      return {
+        expression: `${a} + ${b} × ${c} + ${d}`,
+        answer: a + product + d,
+      };
+    },
+    () => {
+      // a × b + c - d, ensuring a × b + c > d
+      const a = randInt(2, 6);
+      const b = randInt(2, Math.floor(max / a));
+      const product = a * b;
+      const c = randInt(1, Math.floor((max - product) / 2));
+      const sum = product + c;
+      const d = randInt(1, sum - 1);
+      return {
+        expression: `${a} × ${b} + ${c} - ${d}`,
+        answer: sum - d,
+      };
+    },
+    () => {
+      // a + b - c + d, ensuring no negative intermediate
+      const a = randInt(2, Math.floor(max / 2));
+      const b = randInt(1, Math.floor(max / 3));
+      const c = randInt(1, a + b - 1);
+      const d = randInt(1, max);
+      return {
+        expression: `${a} + ${b} - ${c} + ${d}`,
+        answer: a + b - c + d,
+      };
+    },
+  ];
   
-  // Handle parentheses first if present
-  if (parenStart >= 0 && nums.length >= 3) {
-    // Evaluate the parenthesized part first
-    const idx = parenStart;
-    const op1 = operations[idx];
-    const op2 = operations[idx + 1];
-    
-    // First operation inside parentheses
-    let innerResult: number;
-    if (op1 === '+') {
-      innerResult = nums[idx] + nums[idx + 1];
-    } else if (op1 === '-') {
-      innerResult = nums[idx] - nums[idx + 1];
-    } else if (op1 === '×') {
-      innerResult = nums[idx] * nums[idx + 1];
-    } else {
-      innerResult = Math.floor(nums[idx] / nums[idx + 1]);
-    }
-    
-    // Second operation with the result
-    if (op2 === '+') {
-      return innerResult + nums[idx + 2];
-    } else if (op2 === '-') {
-      return innerResult - nums[idx + 2];
-    } else if (op2 === '×') {
-      return innerResult * nums[idx + 2];
-    } else {
-      return Math.floor(innerResult / nums[idx + 2]);
-    }
-  }
+  const pattern = patterns[randInt(0, patterns.length - 1)]();
   
-  // Standard order of operations: × and ÷ first, then + and -
-  // First pass: handle × and ÷
-  let i = 0;
-  while (i < operations.length) {
-    if (operations[i] === '×' || operations[i] === '÷') {
-      const result = operations[i] === '×' 
-        ? nums[i] * nums[i + 1]
-        : Math.floor(nums[i] / nums[i + 1]);
-      
-      nums.splice(i, 2, result);
-      operations.splice(i, 1);
-    } else {
-      i++;
-    }
-  }
+  return {
+    a: 0,
+    b: 0,
+    op: '+',
+    answer: pattern.answer,
+    expression: pattern.expression,
+    steps: 3,
+    hasParens,
+  };
+}
+
+function generateFourStepQuestion(max: number): Question {
+  const patterns = [
+    () => {
+      // (a + b) × c + d - e
+      const a = randInt(1, Math.floor(max / 5));
+      const b = randInt(1, Math.floor(max / 5));
+      const c = randInt(2, 5);
+      const product = (a + b) * c;
+      const d = randInt(1, Math.floor((max - product) / 2));
+      const sum = product + d;
+      const e = randInt(1, sum - 1);
+      return {
+        expression: `(${a} + ${b}) × ${c} + ${d} - ${e}`,
+        answer: sum - e,
+      };
+    },
+    () => {
+      // a × (b + c) + d - e
+      const a = randInt(2, 5);
+      const b = randInt(1, Math.floor(max / (a * 3)));
+      const c = randInt(1, Math.floor(max / (a * 3)));
+      const product = a * (b + c);
+      const d = randInt(1, Math.floor((max - product) / 2));
+      const sum = product + d;
+      const e = randInt(1, sum - 1);
+      return {
+        expression: `${a} × (${b} + ${c}) + ${d} - ${e}`,
+        answer: sum - e,
+      };
+    },
+    () => {
+      // a + b × c + d - e (order of operations)
+      const b = randInt(2, 5);
+      const c = randInt(2, Math.floor(max / b));
+      const product = b * c;
+      const a = randInt(1, Math.floor((max - product) / 3));
+      const d = randInt(1, Math.floor((max - product - a) / 2));
+      const sum = a + product + d;
+      const e = randInt(1, sum - 1);
+      return {
+        expression: `${a} + ${b} × ${c} + ${d} - ${e}`,
+        answer: sum - e,
+      };
+    },
+    () => {
+      // (a - b) × c + d + e, ensuring a > b
+      const b = randInt(1, Math.floor(max / 8));
+      const a = randInt(b + 1, b + Math.floor(max / 8));
+      const c = randInt(2, 5);
+      const product = (a - b) * c;
+      const d = randInt(1, Math.floor((max - product) / 2));
+      const e = randInt(1, max - product - d);
+      return {
+        expression: `(${a} - ${b}) × ${c} + ${d} + ${e}`,
+        answer: product + d + e,
+      };
+    },
+  ];
   
-  // Second pass: handle + and -
-  let result = nums[0];
-  for (let j = 0; j < operations.length; j++) {
-    if (operations[j] === '+') {
-      result += nums[j + 1];
-    } else {
-      result -= nums[j + 1];
-    }
-  }
+  const pattern = patterns[randInt(0, patterns.length - 1)]();
   
-  return result;
+  return {
+    a: 0,
+    b: 0,
+    op: '+',
+    answer: pattern.answer,
+    expression: pattern.expression,
+    steps: 4,
+    hasParens: true,
+  };
 }
 
 export function generateRound(stageId: StageId, difficulty: Difficulty): Question[] {
