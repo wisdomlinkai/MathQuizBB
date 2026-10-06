@@ -3,25 +3,26 @@
 import { Amplify } from 'aws-amplify';
 import { getCurrentUser, fetchAuthSession, signInWithRedirect, signOut as amplifySignOut } from 'aws-amplify/auth';
 
-// EduQ AI Cognito configuration (shared with main platform)
-const cognitoConfig = {
-  userPoolId: 'ap-southeast-1_ISUlRZfpp',
-  userPoolClientId: '2ool529f04qgucriv7bqtbqpoh',
-  loginWith: {
-    oauth: {
-      domain: 'eduq-ai-gen2.auth.ap-southeast-1.amazoncognito.com',
-      scopes: ['email', 'openid', 'profile'],
-      redirectSignIn: ['https://mathchampion.game.eduq-ai.com/', 'http://localhost:5173/'],
-      redirectSignOut: ['https://mathchampion.game.eduq-ai.com/', 'http://localhost:5173/'],
-      responseType: 'code',
-    },
-  },
-};
+// Determine redirect URLs based on environment
+const isLocalhost = typeof window !== 'undefined' && window.location.hostname === 'localhost';
+const redirectUrl = isLocalhost ? 'http://localhost:5173/' : 'https://mathchampion.game.eduq-ai.com/';
 
-// Configure Amplify
+// EduQ AI Cognito configuration (shared with main platform)
 Amplify.configure({
   Auth: {
-    Cognito: cognitoConfig,
+    Cognito: {
+      userPoolId: 'ap-southeast-1_ISUlRZfpp',
+      userPoolClientId: '2ool529f04qgucriv7bqtbqpoh',
+      loginWith: {
+        oauth: {
+          domain: 'eduq-ai-gen2.auth.ap-southeast-1.amazoncognito.com',
+          scopes: ['email', 'openid', 'profile'],
+          redirectSignIn: [redirectUrl],
+          redirectSignOut: [redirectUrl],
+          responseType: 'code',
+        },
+      },
+    },
   },
 });
 
