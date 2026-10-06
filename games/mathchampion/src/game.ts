@@ -66,58 +66,14 @@ export const STAGES: StageMeta[] = [
     gradient: 'from-cyan-300 to-cyan-500',
   },
   {
-    id: 'two_step',
-    label: 'Two-Step',
-    labelZh: '兩步運算',
-    emoji: '🔢',
-    operations: ['+', '-', '×', '÷'],
-    color: 'purple',
-    gradient: 'from-purple-300 to-purple-500',
-    steps: 2,
-    hasParens: false,
-  },
-  {
-    id: 'two_step_parens',
-    label: 'Two-Step ( )',
-    labelZh: '兩步括號',
-    emoji: '📦',
-    operations: ['+', '-', '×', '÷'],
-    color: 'pink',
-    gradient: 'from-pink-300 to-pink-500',
-    steps: 2,
-    hasParens: true,
-  },
-  {
-    id: 'three_step',
-    label: 'Three-Step',
-    labelZh: '三步運算',
-    emoji: '🧮',
-    operations: ['+', '-', '×', '÷'],
-    color: 'indigo',
-    gradient: 'from-indigo-300 to-indigo-500',
-    steps: 3,
-    hasParens: false,
-  },
-  {
-    id: 'three_step_parens',
-    label: 'Three-Step ( )',
-    labelZh: '三步括號',
-    emoji: '🎯',
-    operations: ['+', '-', '×', '÷'],
-    color: 'rose',
-    gradient: 'from-rose-300 to-rose-500',
-    steps: 3,
-    hasParens: true,
-  },
-  {
-    id: 'four_step',
-    label: 'Four-Step',
-    labelZh: '四步運算',
+    id: 'ultimate',
+    label: 'Ultimate Challenge',
+    labelZh: '終極挑戰',
     emoji: '🎓',
     operations: ['+', '-', '×', '÷'],
-    color: 'violet',
-    gradient: 'from-violet-300 to-violet-500',
-    steps: 4,
+    color: 'purple',
+    gradient: 'from-purple-400 to-violet-600',
+    steps: -1, // -1 means random steps from 2-4
     hasParens: true,
   },
 ];
@@ -470,12 +426,19 @@ export function generateRound(stageId: StageId, difficulty: Difficulty): Questio
 
   // Check if this is a multi-step stage
   const isMultiStep = stage.steps !== undefined && stage.steps >= 2;
+  // Ultimate challenge has steps = -1 (random)
+  const isUltimate = stage.steps === -1;
 
   let attempts = 0;
   while (questions.length < QUESTIONS_PER_ROUND && attempts < 200) {
     let q: Question;
     
-    if (isMultiStep) {
+    if (isUltimate) {
+      // Random steps between 2-4, randomly include parentheses
+      const randomSteps = randInt(2, 4);
+      const randomParens = Math.random() > 0.3; // 70% chance of parentheses
+      q = generateMultiStepQuestion(randomSteps, randomParens, diff.maxDigits);
+    } else if (isMultiStep) {
       q = generateMultiStepQuestion(
         stage.steps!,
         stage.hasParens ?? false,
@@ -494,7 +457,11 @@ export function generateRound(stageId: StageId, difficulty: Difficulty): Questio
   }
 
   while (questions.length < QUESTIONS_PER_ROUND) {
-    if (isMultiStep) {
+    if (isUltimate) {
+      const randomSteps = randInt(2, 4);
+      const randomParens = Math.random() > 0.3;
+      questions.push(generateMultiStepQuestion(randomSteps, randomParens, diff.maxDigits));
+    } else if (isMultiStep) {
       questions.push(generateMultiStepQuestion(
         stage.steps!,
         stage.hasParens ?? false,

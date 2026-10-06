@@ -7,11 +7,7 @@ export type StageId =
   | 'multiplication' 
   | 'division' 
   | 'mixed_mul'
-  | 'two_step'
-  | 'two_step_parens'
-  | 'three_step'
-  | 'three_step_parens'
-  | 'four_step';
+  | 'ultimate';
 
 export type QuestionType = 'simple' | 'multi_step';
 
