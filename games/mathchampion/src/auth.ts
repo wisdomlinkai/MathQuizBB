@@ -19,14 +19,10 @@ Amplify.configure({
           scopes: ['email', 'openid', 'profile'],
           redirectSignIn: [redirectUrl],
           redirectSignOut: [redirectUrl],
-          responseType: 'code',
+          responseType: 'token', // Use implicit flow to avoid PKCE issues
         },
       },
     },
-  },
-}, {
-  Auth: {
-    disablePKCE: true,  // Disable PKCE for Cognito compatibility
   },
 });
 
