@@ -1,12 +1,12 @@
 // AWS Configuration for Math Champions
-// Production values are hardcoded for Amplify deployment
+// Uses EduQ AI shared Cognito User Pool
 
 export const awsConfig = {
-  // Amazon Cognito Configuration
+  // Amazon Cognito Configuration (EduQ AI shared pool)
   cognito: {
-    userPoolId: 'ap-southeast-1_GBHJD77aF',
-    userPoolClientId: '5ot2gj93pefpc2hj1l5mbugb5t',
-    domain: 'eduq-games.auth.ap-southeast-1.amazoncognito.com',
+    userPoolId: 'ap-southeast-1_ISUlRZfpp',
+    userPoolClientId: '2ool529f04qgucriv7bqtbqpoh',
+    domain: 'eduq-ai-gen2.auth.ap-southeast-1.amazoncognito.com',
     region: 'ap-southeast-1',
   },
 
@@ -31,13 +31,7 @@ export const oauthConfig = {
 
 // Feature flags for AWS integration
 export const features = {
-  // Enable/disable AWS backend sync
   useAwsBackend: true,
-  
-  // Enable/disable offline mode
   offlineMode: false,
-  
-  // Enable/disable analytics
   analytics: false,
 };
-

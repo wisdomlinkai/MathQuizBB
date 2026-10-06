@@ -1,35 +1,27 @@
 // AWS Cognito authentication for Math Champions
+// Uses the main EduQ AI User Pool for shared authentication
 import { Amplify } from 'aws-amplify';
 import { getCurrentUser, fetchAuthSession, signInWithRedirect, signOut as amplifySignOut } from 'aws-amplify/auth';
 
-// Cognito configuration
+// EduQ AI Cognito configuration (shared with main platform)
 const cognitoConfig = {
-  userPoolId: 'ap-southeast-1_GBHJD77aF',
-  userPoolClientId: '5ot2gj93pefpc2hj1l5mbugb5t',
-  domain: 'eduq-games.auth.ap-southeast-1.amazoncognito.com',
-  region: 'ap-southeast-1',
-};
-
-// OAuth configuration
-const oauthConfig = {
-  domain: cognitoConfig.domain,
-  scope: ['email', 'openid', 'profile'],
-  redirectSignIn: 'https://mathchampion.game.eduq-ai.com/',
-  redirectSignOut: 'https://mathchampion.game.eduq-ai.com/',
-  responseType: 'code',
+  userPoolId: 'ap-southeast-1_ISUlRZfpp',
+  userPoolClientId: '2ool529f04qgucriv7bqtbqpoh',
+  loginWith: {
+    oauth: {
+      domain: 'eduq-ai-gen2.auth.ap-southeast-1.amazoncognito.com',
+      scopes: ['email', 'openid', 'profile'],
+      redirectSignIn: ['https://mathchampion.game.eduq-ai.com/', 'http://localhost:5173/'],
+      redirectSignOut: ['https://mathchampion.game.eduq-ai.com/', 'http://localhost:5173/'],
+      responseType: 'code',
+    },
+  },
 };
 
 // Configure Amplify
 Amplify.configure({
   Auth: {
-    Cognito: {
-      userPoolId: cognitoConfig.userPoolId,
-      userPoolClientId: cognitoConfig.userPoolClientId,
-      signUpVerificationMethod: 'code',
-      loginWith: {
-        oauth: oauthConfig,
-      },
-    },
+    Cognito: cognitoConfig,
   },
 });
 
