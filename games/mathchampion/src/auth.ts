@@ -16,10 +16,10 @@ Amplify.configure({
       loginWith: {
         oauth: {
           domain: 'eduq-ai-gen2.auth.ap-southeast-1.amazoncognito.com',
-          scopes: ['email', 'openid', 'profile'],
+          scopes: ['email', 'openid', 'profile', 'aws.cognito.signin.user.admin'],
           redirectSignIn: [redirectUrl],
           redirectSignOut: [redirectUrl],
-          responseType: 'token', // Use implicit flow to avoid PKCE issues
+          responseType: 'code', // Use code flow with PKCE (Amplify v6 handles PKCE automatically)
         },
       },
     },
