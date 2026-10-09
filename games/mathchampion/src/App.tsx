@@ -199,11 +199,15 @@ export default function App() {
       // Sync with AWS backend if authenticated
       if (auth.isAuthenticated) {
         try {
-          // Submit score to backend
+          // Submit score to leaderboard
           await api.submitScore(
             result.stageId,
             result.score,
-            result.timeInSeconds || 0
+            result.timeInSeconds || 0,
+            result.difficulty,
+            result.stars,
+            result.correct,
+            result.total
           );
 
           // Update progress on backend
