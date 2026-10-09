@@ -121,6 +121,13 @@ export default function App() {
     syncWithBackend();
   }, [auth.isAuthenticated]);
 
+  // Sync player name with auth user name when authenticated
+  useEffect(() => {
+    if (auth.isAuthenticated && auth.user?.name && player.name !== auth.user.name) {
+      setPlayer((prev) => ({ ...prev, name: auth.user.name }));
+    }
+  }, [auth.isAuthenticated, auth.user?.name, player.name]);
+
   // Login handler - uses Cognito hosted UI
   const handleLogin = useCallback(async () => {
     try {

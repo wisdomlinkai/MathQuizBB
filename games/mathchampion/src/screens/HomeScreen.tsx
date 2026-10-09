@@ -57,9 +57,15 @@ export function HomeScreen({
         {/* Header with Logo and Auth Button */}
         <div className="w-full flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="w-14 h-14 rounded-2xl bg-white flex items-center justify-center shadow-lg animate-float overflow-hidden p-1.5">
-              <img src="/app-logo.png" alt="Math Champions" className="w-[80%] h-[80%] object-contain" />
-            </div>
+            <a 
+              href="https://www.eduq-ai.com" 
+              target="_blank" 
+              rel="noopener noreferrer"
+              className="w-14 h-14 rounded-2xl bg-white flex items-center justify-center shadow-lg animate-float overflow-hidden p-1.5 hover:shadow-xl transition-shadow cursor-pointer"
+              title="Visit EduQ AI"
+            >
+              <img src="/app-logo.png" alt="EduQ AI" className="w-[80%] h-[80%] object-contain" />
+            </a>
             <div className="text-left">
               <h1 className="font-display font-extrabold text-3xl text-sky-700 leading-tight">
                 Math Champions

@@ -40,9 +40,29 @@ export async function getAuthUser(): Promise<AuthUser | null> {
     
     // Extract name from ID token if available
     const idToken = session.tokens?.idToken;
-    const name = idToken?.payload?.name as string || 
-                 idToken?.payload?.email?.split('@')[0] as string || 
-                 'Player';
+    
+    // Try multiple sources for the name
+    let name = 'Player';
+    
+    // 1. Check if name is in the token payload
+    if (idToken?.payload?.name) {
+      name = idToken.payload.name as string;
+    }
+    // 2. Check if there's a custom attribute for name
+    else if (idToken?.payload?.['custom:name']) {
+      name = idToken.payload['custom:name'] as string;
+    }
+    // 3. Try to get from Cognito attributes
+    else if (idToken?.payload?.given_name) {
+      const givenName = idToken.payload.given_name as string;
+      const familyName = idToken?.payload?.family_name as string;
+      name = familyName ? `${givenName} ${familyName}` : givenName;
+    }
+    // 4. Fallback to email username
+    else if (idToken?.payload?.email) {
+      const email = idToken.payload.email as string;
+      name = email.split('@')[0];
+    }
     
     return {
       userId: user.userId,
