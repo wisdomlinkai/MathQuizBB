@@ -2,6 +2,7 @@ import { ArrowLeft, Trophy, Medal } from 'lucide-react';
 import { AvatarDisplay } from '@/components/Avatar';
 import { PoweredByFooter } from '@/components/PoweredByFooter';
 import { AuthButton } from '@/components/AuthButton';
+import { useTranslation } from '@/i18n';
 import { STAGES, DIFFICULTIES } from '@/game';
 import type { LeaderboardEntry, User } from '@/types';
 
@@ -26,6 +27,7 @@ export function LeaderboardScreen({
   onViewProfile,
   onBack 
 }: LeaderboardScreenProps) {
+  const { t } = useTranslation();
   return (
     <div className="min-h-[100dvh] px-4 py-5 safe-top safe-bottom">
       <div className="max-w-md mx-auto">
@@ -38,8 +40,7 @@ export function LeaderboardScreen({
             <ArrowLeft className="w-5 h-5 text-sky-600" />
           </button>
           <div className="flex-1">
-            <h2 className="font-display font-extrabold text-2xl text-sky-700">Leaderboard</h2>
-            <p className="font-body font-semibold text-sky-400 text-sm">排行榜</p>
+            <h2 className="font-display font-extrabold text-2xl text-sky-700">{t('leaderboard.title')}</h2>
           </div>
           {/* Auth Button */}
           {onLogin && onLogout && (
@@ -61,16 +62,16 @@ export function LeaderboardScreen({
                 <Trophy className="w-8 h-8 text-sky-500" />
               </div>
               <h3 className="font-display font-bold text-lg text-sky-700 mb-2">
-                Sign up to see the leaderboard!
+                {t('leaderboard.signUpPrompt')}
               </h3>
               <p className="font-body font-semibold text-sky-500 text-sm mb-4">
-                Compete with other players and track your rankings.
+                {t('leaderboard.competeText')}
               </p>
               <button
                 onClick={onLogin}
                 className="bg-gradient-to-r from-sky-500 to-sky-600 text-white font-display font-bold py-3 px-6 rounded-xl shadow-md active:scale-95 transition-transform"
               >
-                Sign Up / Log In
+                {t('auth.signIn')}
               </button>
             </div>
           </div>
@@ -82,10 +83,10 @@ export function LeaderboardScreen({
               <Trophy className="w-12 h-12 text-sun-300" />
             </div>
             <p className="font-display font-semibold text-sky-500 text-lg text-center">
-              No scores yet!
+              {t('leaderboard.noScores')}
             </p>
             <p className="font-body font-semibold text-sky-400 text-sm text-center">
-              Play a round to get on the board
+              {t('leaderboard.playToGetOnBoard')}
             </p>
           </div>
         ) : (
@@ -97,7 +98,7 @@ export function LeaderboardScreen({
                   <div className="text-center">
                     <Trophy className="w-12 h-12 text-sky-400 mx-auto mb-2 opacity-50" />
                     <p className="font-display font-semibold text-sky-600 text-sm">
-                      🔒 Sign up to view rankings
+                      🔒 {t('leaderboard.signUpToView')}
                     </p>
                   </div>
                 </div>
@@ -164,10 +165,10 @@ export function LeaderboardScreen({
                   <div className="flex-1 min-w-0">
                     <p className="font-display font-bold text-sky-800 text-sm truncate">
                       {entry.name}
-                      {isCurrent && <span className="text-sky-500 text-xs"> (You)</span>}
+                      {isCurrent && <span className="text-sky-500 text-xs"> ({t('leaderboard.you')})</span>}
                     </p>
                     <p className="font-body font-semibold text-sky-400 text-[10px]">
-                      {stage?.emoji} {stage?.label} · {diff?.label} · {entry.stars}★
+                      {stage?.emoji} {t(`stages.${stage?.id}`)} · {t(`difficulty.${diff?.id}`)} · {entry.stars}★
                     </p>
                   </div>
 
