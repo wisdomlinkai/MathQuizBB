@@ -1,6 +1,14 @@
 import type { Translations } from './types';
 
 export const zhHK: Translations = {
+  daily: {
+    challenge: 'Daily Challenge',
+    challengeZh: '每日挑戰',
+    done: 'Daily Done!',
+    doneZh: '今日已完成！',
+    comeBack: 'Come back tomorrow',
+    comeBackZh: '明天再嚟！',
+  },
   game: {
     title: 'Math Champions',
     titleZh: '數學小達人',

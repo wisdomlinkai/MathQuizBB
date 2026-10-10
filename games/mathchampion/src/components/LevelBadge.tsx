@@ -1,4 +1,5 @@
 import { levelFromXp, getLevelTitle } from '@/game';
+import { useTranslation } from '@/i18n';
 
 interface LevelBadgeProps {
   xp: number;
@@ -6,6 +7,7 @@ interface LevelBadgeProps {
 }
 
 export function LevelBadge({ xp, size = 'md' }: LevelBadgeProps) {
+  const { showBoth } = useTranslation();
   const { level, currentLevelXp, nextLevelXp, progress } = levelFromXp(xp);
   const title = getLevelTitle(level);
 
@@ -25,7 +27,9 @@ export function LevelBadge({ xp, size = 'md' }: LevelBadgeProps) {
         <div className="flex flex-col gap-1 min-w-[80px]">
           <div className="flex items-baseline justify-between gap-2">
             <span className={`font-display font-bold text-sky-700 ${s.text}`}>Lv {level}</span>
-            <span className="font-body font-semibold text-sky-400 text-[10px]">{title.zh}</span>
+            <span className="font-body font-semibold text-sky-400 text-[10px]">
+              {title.en} {showBoth && title.zh}
+            </span>
           </div>
           <div className={`w-full ${s.bar} rounded-full bg-sky-100 overflow-hidden`}>
             <div

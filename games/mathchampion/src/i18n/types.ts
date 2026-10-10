@@ -109,6 +109,14 @@ export interface TranslationStrings {
 }
 
 export interface Translations {
+  daily: {
+    challenge: string;
+    challengeZh: string;
+    done: string;
+    doneZh: string;
+    comeBack: string;
+    comeBackZh: string;
+  };
   game: {
     title: string;
     titleZh: string;

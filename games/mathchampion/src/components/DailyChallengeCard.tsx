@@ -1,5 +1,6 @@
 import { Calendar, Check, Flame } from 'lucide-react';
 import { generateDailyRound, STAGES, DIFFICULTIES } from '@/game';
+import { useTranslation } from '@/i18n';
 
 interface DailyChallengeCardProps {
   available: boolean;
@@ -8,6 +9,7 @@ interface DailyChallengeCardProps {
 }
 
 export function DailyChallengeCard({ available, dailyStreak, onPlay }: DailyChallengeCardProps) {
+  const { t, showBoth } = useTranslation();
   const daily = generateDailyRound();
   const stage = STAGES.find((s) => s.id === daily.stageId)!;
   const diff = DIFFICULTIES.find((d) => d.id === daily.difficulty)!;
@@ -20,8 +22,12 @@ export function DailyChallengeCard({ available, dailyStreak, onPlay }: DailyChal
             <Check className="w-6 h-6 text-mint-600" />
           </div>
           <div className="flex-1">
-            <p className="font-display font-bold text-gray-600 text-base">Daily Done!</p>
-            <p className="font-body font-semibold text-gray-500 text-sm">今日已完成 · Come back tomorrow</p>
+            <p className="font-display font-bold text-gray-600 text-base">
+              {t('daily.done')} {showBoth && t('daily.doneZh')}
+            </p>
+            <p className="font-body font-semibold text-gray-500 text-sm">
+              {t('daily.comeBack')} {showBoth && t('daily.comeBackZh')}
+            </p>
           </div>
           {dailyStreak > 0 && (
             <div className="flex items-center gap-1 bg-white/50 rounded-xl px-2 py-1">
@@ -44,9 +50,11 @@ export function DailyChallengeCard({ available, dailyStreak, onPlay }: DailyChal
           <Calendar className="w-6 h-6 text-white" />
         </div>
         <div className="flex-1">
-          <p className="font-display font-bold text-white text-base">Daily Challenge</p>
+          <p className="font-display font-bold text-white text-base">
+            {t('daily.challenge')} {showBoth && t('daily.challengeZh')}
+          </p>
           <p className="font-body font-semibold text-white/80 text-sm">
-            每日挑戰 · {stage.emoji} {stage.label} · {diff.label}
+            {stage.emoji} {t(`stages.${stage.id}`)} {showBoth && t(`stages.${stage.id}Zh`)} · {t(`difficulty.${diff.id}`)} {showBoth && t(`difficulty.${diff.id}Zh`)}
           </p>
         </div>
         {dailyStreak > 0 && (
