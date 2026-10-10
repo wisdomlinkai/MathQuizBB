@@ -39,7 +39,7 @@ export function HomeScreen({
   onLeaderboard,
   onBadges,
 }: HomeScreenProps) {
-  const { t, showBoth } = useTranslation();
+  const { t } = useTranslation();
   const [name, setName] = useState(player.name);
   const [avatar, setAvatar] = useState(player.avatar);
   const [showAvatarPicker, setShowAvatarPicker] = useState(false);
@@ -73,9 +73,6 @@ export function HomeScreen({
               <h1 className="font-display font-extrabold text-3xl text-sky-700 leading-tight">
                 {t('game.title')}
               </h1>
-              {showBoth && (
-                <p className="font-display font-semibold text-sun-500 text-lg">{t('game.titleZh')}</p>
-              )}
             </div>
           </div>
           {/* Language Switcher + Auth Button */}
@@ -102,7 +99,7 @@ export function HomeScreen({
           >
             <AvatarDisplay avatar={avatar} size="md" />
             <span className="font-body font-semibold text-sky-600 text-[10px] group-hover:text-sky-700">
-              {showAvatarPicker ? 'Close' : 'Change'}
+              {t('common.change')}
             </span>
           </button>
         </div>
@@ -116,7 +113,7 @@ export function HomeScreen({
         {/* Name input */}
         <div className="w-full">
           <label className="font-body font-semibold text-sky-700 text-sm mb-1.5 block">
-            {t('game.yourName')} {showBoth && t('game.yourNameZh')}
+            {t('game.yourName')}
           </label>
           <input
             type="text"
@@ -141,7 +138,7 @@ export function HomeScreen({
           className="w-full h-16 rounded-2xl bg-gradient-to-r from-mint-400 to-mint-500 text-white font-display font-bold text-2xl shadow-lg active:scale-95 transition-all duration-150 flex items-center justify-center gap-3 hover:shadow-xl"
         >
           <Play className="w-7 h-7 fill-white" />
-          {t('common.play')} {showBoth && t('common.playZh')}
+          {t('common.play')}
         </button>
 
         {/* Leaderboard + Badges buttons */}

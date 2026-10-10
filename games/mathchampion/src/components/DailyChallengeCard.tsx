@@ -9,7 +9,7 @@ interface DailyChallengeCardProps {
 }
 
 export function DailyChallengeCard({ available, dailyStreak, onPlay }: DailyChallengeCardProps) {
-  const { t, showBoth } = useTranslation();
+  const { t } = useTranslation();
   const daily = generateDailyRound();
   const stage = STAGES.find((s) => s.id === daily.stageId)!;
   const diff = DIFFICULTIES.find((d) => d.id === daily.difficulty)!;
@@ -23,10 +23,10 @@ export function DailyChallengeCard({ available, dailyStreak, onPlay }: DailyChal
           </div>
           <div className="flex-1">
             <p className="font-display font-bold text-gray-600 text-base">
-              {t('daily.done')} {showBoth && t('daily.doneZh')}
+              {t('daily.done')}
             </p>
             <p className="font-body font-semibold text-gray-500 text-sm">
-              {t('daily.comeBack')} {showBoth && t('daily.comeBackZh')}
+              {t('daily.comeBack')}
             </p>
           </div>
           {dailyStreak > 0 && (
@@ -51,10 +51,10 @@ export function DailyChallengeCard({ available, dailyStreak, onPlay }: DailyChal
         </div>
         <div className="flex-1">
           <p className="font-display font-bold text-white text-base">
-            {t('daily.challenge')} {showBoth && t('daily.challengeZh')}
+            {t('daily.challenge')}
           </p>
           <p className="font-body font-semibold text-white/80 text-sm">
-            {stage.emoji} {t(`stages.${stage.id}`)} {showBoth && t(`stages.${stage.id}Zh`)} · {t(`difficulty.${diff.id}`)} {showBoth && t(`difficulty.${diff.id}Zh`)}
+            {stage.emoji} {t(`stages.${stage.id}`)} · {t(`difficulty.${diff.id}`)}
           </p>
         </div>
         {dailyStreak > 0 && (

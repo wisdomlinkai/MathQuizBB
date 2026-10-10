@@ -3,7 +3,7 @@ import { en } from './en';
 import { zhHK } from './zh-HK';
 import type { Translations } from './types';
 
-type Language = 'en' | 'zh-HK' | 'both';
+type Language = 'en' | 'zh-HK';
 
 const translations: Record<'en' | 'zh-HK', Translations> = {
   en,
@@ -12,21 +12,18 @@ const translations: Record<'en' | 'zh-HK', Translations> = {
 
 interface I18nContextType {
   t: (key: string) => string;
-  tBoth: (keyEn: string, keyZh: string) => { en: string; zh: string };
   language: Language;
   setLanguage: (lang: Language) => void;
-  showBoth: boolean;
 }
 
 const I18nContext = createContext<I18nContextType | undefined>(undefined);
 
-export function I18nProvider({ children, defaultLanguage = 'both' }: { children: ReactNode; defaultLanguage?: Language }) {
+export function I18nProvider({ children, defaultLanguage = 'en' }: { children: ReactNode; defaultLanguage?: Language }) {
   const [language, setLanguage] = useState<Language>(defaultLanguage);
 
   const t = (key: string): string => {
-    const currentLang: 'en' | 'zh-HK' = language === 'both' ? 'en' : language;
     const keys = key.split('.');
-    let value: any = translations[currentLang];
+    let value: any = translations[language];
     
     for (const k of keys) {
       if (value && typeof value === 'object' && k in value) {
@@ -40,35 +37,11 @@ export function I18nProvider({ children, defaultLanguage = 'both' }: { children:
     return typeof value === 'string' ? value : key;
   };
 
-  const tBoth = (keyEn: string, keyZh: string): { en: string; zh: string } => {
-    return {
-      en: getTranslation('en', keyEn),
-      zh: getTranslation('zh-HK', keyZh),
-    };
-  };
-
-  const getTranslation = (lang: 'en' | 'zh-HK', key: string): string => {
-    const keys = key.split('.');
-    let value: any = translations[lang];
-    
-    for (const k of keys) {
-      if (value && typeof value === 'object' && k in value) {
-        value = value[k];
-      } else {
-        return key;
-      }
-    }
-    
-    return typeof value === 'string' ? value : key;
-  };
-
   return (
     <I18nContext.Provider value={{ 
       t, 
-      tBoth, 
       language, 
-      setLanguage,
-      showBoth: language === 'both'
+      setLanguage
     }}>
       {children}
     </I18nContext.Provider>

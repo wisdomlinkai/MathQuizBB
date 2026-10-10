@@ -39,16 +39,16 @@ export function ResultsScreen({
   onHome,
   onLeaderboard,
 }: ResultsScreenProps) {
-  const { t, showBoth } = useTranslation();
+  const { t } = useTranslation();
   const stage = STAGES.find((s) => s.id === result.stageId)!;
   const diff = DIFFICULTIES.find((d) => d.id === result.difficulty)!;
   const accuracy = Math.round((result.correct / result.total) * 100);
 
-  const titleMap: Record<number, { en: string; zh: string }> = {
-    3: { en: t('results.perfect'), zh: t('results.perfectZh') },
-    2: { en: t('results.great'), zh: t('results.greatZh') },
-    1: { en: t('results.good'), zh: t('results.goodZh') },
-    0: { en: t('results.practice'), zh: t('results.practiceZh') },
+  const titleMap: Record<number, string> = {
+    3: t('results.perfect'),
+    2: t('results.great'),
+    1: t('results.good'),
+    0: t('results.practice'),
   };
   const title = titleMap[result.stars] ?? titleMap[0];
 
@@ -66,18 +66,17 @@ export function ResultsScreen({
         {leveledUp && (
           <div className="w-full bg-gradient-to-r from-grape-400 to-grape-600 rounded-2xl py-3 px-4 text-center shadow-lg animate-bounce-in">
             <p className="font-display font-extrabold text-white text-xl">
-              {t('results.levelUp')} {showBoth && t('results.levelUpZh')}
+              {t('results.levelUp')}
             </p>
             <p className="font-display font-bold text-white/90 text-base">
-              Level {newLevel} · {levelTitle.en} {showBoth && levelTitle.zh}
+              Level {newLevel} · {levelTitle.en}
             </p>
           </div>
         )}
 
         {/* Title */}
         <div className="text-center">
-          <h2 className="font-display font-extrabold text-3xl text-sky-700">{title.en}</h2>
-          {showBoth && <p className="font-display font-semibold text-2xl text-sun-500">{title.zh}</p>}
+          <h2 className="font-display font-extrabold text-3xl text-sky-700">{title}</h2>
         </div>
 
         {/* Stars */}
@@ -99,10 +98,10 @@ export function ResultsScreen({
           </div>
 
           <div className="grid grid-cols-2 gap-3">
-            <StatBox label={t('game.score')} labelZh={showBoth ? '分數' : ''} value={result.score} color="sky" />
-            <StatBox label={t('game.correct')} labelZh={showBoth ? '答對' : ''} value={`${result.correct}/${result.total}`} color="mint" />
-            <StatBox label={t('game.accuracy')} labelZh={showBoth ? '正確率' : ''} value={`${accuracy}%`} color="sun" />
-            <StatBox label={t('game.bestStreak')} labelZh={showBoth ? '最高連擊' : ''} value={result.maxStreak} color="coral" />
+            <StatBox label={t('game.score')} value={result.score} color="sky" />
+            <StatBox label={t('game.correct')} value={`${result.correct}/${result.total}`} color="mint" />
+            <StatBox label={t('game.accuracy')} value={`${accuracy}%`} color="sun" />
+            <StatBox label={t('game.bestStreak')} value={result.maxStreak} color="coral" />
           </div>
 
           {/* XP earned */}
@@ -131,7 +130,7 @@ export function ResultsScreen({
           {isNewHighScore && (
             <div className="bg-sun-100 rounded-2xl py-2.5 text-center animate-wiggle">
               <span className="font-display font-bold text-sun-600">
-                {t('results.newHighScore')} {showBoth && t('results.newHighScoreZh')}
+                {t('results.newHighScore')}
               </span>
             </div>
           )}
@@ -143,7 +142,7 @@ export function ResultsScreen({
             <div className="flex items-center gap-2 mb-3">
               <Award className="w-5 h-5 text-grape-500" />
               <span className="font-display font-bold text-grape-600 text-base">
-                {t('results.newBadges')} {showBoth && t('results.newBadgesZh')}
+                {t('results.newBadges')}
               </span>
             </div>
             <div className="flex flex-wrap gap-3">
@@ -170,7 +169,7 @@ export function ResultsScreen({
               onClick={onNext}
               className="w-full h-16 rounded-2xl bg-gradient-to-r from-mint-400 to-mint-500 text-white font-display font-bold text-xl shadow-lg active:scale-95 transition-all flex items-center justify-center gap-2"
             >
-              {t('common.next')} {showBoth && t('common.nextZh')}
+              {t('common.next')}
               <ChevronRight className="w-6 h-6" />
             </button>
           )}
@@ -197,7 +196,7 @@ export function ResultsScreen({
             className="w-full h-12 rounded-2xl bg-sky-50 text-sky-500 font-display font-semibold text-base active:scale-95 transition-all flex items-center justify-center gap-2"
           >
             <Home className="w-5 h-5" />
-            {t('common.home')} {showBoth && t('common.homeZh')}
+            {t('common.home')}
           </button>
         </div>
 
@@ -207,7 +206,7 @@ export function ResultsScreen({
   );
 }
 
-function StatBox({ label, labelZh, value, color }: { label: string; labelZh: string; value: string | number; color: string }) {
+function StatBox({ label, value, color }: { label: string; value: string | number; color: string }) {
   const colorMap: Record<string, string> = {
     sky: 'bg-sky-50 text-sky-700',
     mint: 'bg-mint-50 text-mint-600',
@@ -218,7 +217,6 @@ function StatBox({ label, labelZh, value, color }: { label: string; labelZh: str
     <div className={`rounded-2xl py-3 px-4 text-center ${colorMap[color]}`}>
       <p className="font-display font-extrabold text-2xl">{value}</p>
       <p className="font-body font-semibold text-xs mt-0.5">{label}</p>
-      <p className="font-body font-semibold text-[10px] opacity-70">{labelZh}</p>
     </div>
   );
 }

@@ -41,7 +41,7 @@ export function GameScreen({
   onQuit,
   onComplete,
 }: GameScreenProps) {
-  const { t, showBoth } = useTranslation();
+  const { t } = useTranslation();
   const stage = STAGES.find((s) => s.id === stageId)!;
   const diff = DIFFICULTIES.find((d) => d.id === difficulty)!;
 
@@ -327,7 +327,7 @@ export function GameScreen({
         {feedback === 'none' && (
           <div className="text-center">
             <p className="font-body font-semibold text-sky-600 text-base">
-              Type your answer {showBoth && '輸入答案'}
+              {t('game.typeAnswer')}
             </p>
           </div>
         )}

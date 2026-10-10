@@ -21,6 +21,7 @@ export const en: Translations = {
     yourName: 'Your Name',
     yourNameZh: '你的名字',
     typeName: 'Type your name...',
+    typeAnswer: 'Type your answer',
     dailyChallenge: 'Daily Challenge',
     dailyChallengeZh: '每日挑戰',
     dailyAvailable: 'Play Today\'s Challenge!',

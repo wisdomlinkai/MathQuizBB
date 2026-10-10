@@ -7,9 +7,20 @@ interface LevelBadgeProps {
 }
 
 export function LevelBadge({ xp, size = 'md' }: LevelBadgeProps) {
-  const { showBoth } = useTranslation();
+  const { t } = useTranslation();
   const { level, currentLevelXp, nextLevelXp, progress } = levelFromXp(xp);
-  const title = getLevelTitle(level);
+  
+  // Map level to translation key
+  const getLevelKey = (lvl: number): string => {
+    if (lvl >= 20) return 'levels.legend';
+    if (lvl >= 15) return 'levels.master';
+    if (lvl >= 10) return 'levels.expert';
+    if (lvl >= 7) return 'levels.star';
+    if (lvl >= 4) return 'levels.whiz';
+    if (lvl >= 2) return 'levels.learner';
+    return 'levels.beginner';
+  };
+  const levelKey = getLevelKey(level);
 
   const sizeMap = {
     sm: { badge: 'w-8 h-8 text-sm', text: 'text-xs', bar: 'h-1.5' },
@@ -28,7 +39,7 @@ export function LevelBadge({ xp, size = 'md' }: LevelBadgeProps) {
           <div className="flex items-baseline justify-between gap-2">
             <span className={`font-display font-bold text-sky-700 ${s.text}`}>Lv {level}</span>
             <span className="font-body font-semibold text-sky-400 text-[10px]">
-              {title.en} {showBoth && title.zh}
+              {t(levelKey)}
             </span>
           </div>
           <div className={`w-full ${s.bar} rounded-full bg-sky-100 overflow-hidden`}>
