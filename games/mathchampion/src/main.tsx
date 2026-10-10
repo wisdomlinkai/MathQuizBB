@@ -6,7 +6,7 @@ import './index.css';
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
-    <I18nProvider defaultLanguage="both">
+    <I18nProvider>
       <App />
     </I18nProvider>
   </StrictMode>
