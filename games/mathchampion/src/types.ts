@@ -129,6 +129,12 @@ export interface BadgeDef {
   descriptionZh: string;
 }
 
+export interface AvatarDef {
+  id: string;
+  emoji: string;
+  category?: 'animal' | 'robot' | 'space' | 'character' | 'funny' | 'fantasy' | 'nature';
+}
+
 // Auth types (for Cognito integration)
 export interface User {
   id: string;

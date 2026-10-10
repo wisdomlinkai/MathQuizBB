@@ -808,12 +808,53 @@ export function getEncouragement(correct: boolean, streak: number): { en: string
 }
 
 export const AVATARS = [
-  { id: 'cat', emoji: '🐱' },
-  { id: 'bear', emoji: '🐻' },
-  { id: 'panda', emoji: '🐼' },
-  { id: 'fox', emoji: '🦊' },
-  { id: 'frog', emoji: '🐸' },
-  { id: 'lion', emoji: '🦁' },
-  { id: 'rabbit', emoji: '🐰' },
-  { id: 'owl', emoji: '🦉' },
+  // Animals
+  { id: 'cat', emoji: '🐱', category: 'animal' as const },
+  { id: 'bear', emoji: '🐻', category: 'animal' as const },
+  { id: 'panda', emoji: '🐼', category: 'animal' as const },
+  { id: 'fox', emoji: '🦊', category: 'animal' as const },
+  { id: 'frog', emoji: '🐸', category: 'animal' as const },
+  { id: 'lion', emoji: '🦁', category: 'animal' as const },
+  { id: 'rabbit', emoji: '🐰', category: 'animal' as const },
+  { id: 'owl', emoji: '🦉', category: 'animal' as const },
+  { id: 'penguin', emoji: '🐧', category: 'animal' as const },
+  { id: 'koala', emoji: '🐨', category: 'animal' as const },
+  { id: 'monkey', emoji: '🐵', category: 'animal' as const },
+  { id: 'pig', emoji: '🐷', category: 'animal' as const },
+  
+  // Robots
+  { id: 'robot', emoji: '🤖', category: 'robot' as const },
+  { id: 'alien', emoji: '👾', category: 'robot' as const },
+  
+  // Space
+  { id: 'rocket', emoji: '🚀', category: 'space' as const },
+  { id: 'ufo', emoji: '🛸', category: 'space' as const },
+  { id: 'star', emoji: '🌟', category: 'space' as const },
+  
+  // Characters
+  { id: 'wizard', emoji: '🧙', category: 'character' as const },
+  { id: 'fairy', emoji: '🧚', category: 'character' as const },
+  { id: 'princess', emoji: '👸', category: 'character' as const },
+  { id: 'mermaid', emoji: '🧜‍♀️', category: 'character' as const },
+  
+  // Funny Faces
+  { id: 'clown', emoji: '🤡', category: 'funny' as const },
+  { id: 'ghost', emoji: '👻', category: 'funny' as const },
+  { id: 'masks', emoji: '🎭', category: 'funny' as const },
+  { id: 'funny_face', emoji: '😛', category: 'funny' as const },
+  
+  // Fantasy
+  { id: 'unicorn', emoji: '🦄', category: 'fantasy' as const },
+  { id: 'dragon', emoji: '🐲', category: 'fantasy' as const },
+  
+  // Nature
+  { id: 'flower', emoji: '🌸', category: 'nature' as const },
+  { id: 'rainbow', emoji: '🌈', category: 'nature' as const },
+  { id: 'lightning', emoji: '⚡', category: 'nature' as const },
+  
+  // More fun characters
+  { id: 'cowboy', emoji: '🤠', category: 'character' as const },
+  { id: 'ninja', emoji: '🥷', category: 'character' as const },
+  { id: 'superhero', emoji: '🦸', category: 'character' as const },
+  { id: 'vampire', emoji: '🧛', category: 'fantasy' as const },
 ];

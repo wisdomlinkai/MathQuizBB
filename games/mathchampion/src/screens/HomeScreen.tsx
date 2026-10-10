@@ -5,6 +5,8 @@ import { LevelBadge } from '@/components/LevelBadge';
 import { DailyChallengeCard } from '@/components/DailyChallengeCard';
 import { PoweredByFooter } from '@/components/PoweredByFooter';
 import { AuthButton } from '@/components/AuthButton';
+import { LanguageSwitcher } from '@/components/LanguageSwitcher';
+import { useTranslation } from '@/i18n';
 import { isDailyAvailable } from '@/game';
 import type { PlayerProfile, PlayerStats, User } from '@/types';
 
@@ -37,6 +39,7 @@ export function HomeScreen({
   onLeaderboard,
   onBadges,
 }: HomeScreenProps) {
+  const { t, showBoth } = useTranslation();
   const [name, setName] = useState(player.name);
   const [avatar, setAvatar] = useState(player.avatar);
   const [showAvatarPicker, setShowAvatarPicker] = useState(false);
@@ -68,21 +71,26 @@ export function HomeScreen({
             </a>
             <div className="text-left">
               <h1 className="font-display font-extrabold text-3xl text-sky-700 leading-tight">
-                Math Champions
+                {t('game.title')}
               </h1>
-              <p className="font-display font-semibold text-sun-500 text-lg">數學小達人</p>
+              {showBoth && (
+                <p className="font-display font-semibold text-sun-500 text-lg">{t('game.titleZh')}</p>
+              )}
             </div>
           </div>
-          {/* Auth Button */}
-          {onLogin && onLogout && (
-            <AuthButton
-              isAuthenticated={isAuthenticated}
-              user={authUser}
-              onLogin={onLogin}
-              onLogout={onLogout}
-              onViewProfile={onViewProfile}
-            />
-          )}
+          {/* Language Switcher + Auth Button */}
+          <div className="flex items-center gap-2">
+            <LanguageSwitcher />
+            {onLogin && onLogout && (
+              <AuthButton
+                isAuthenticated={isAuthenticated}
+                user={authUser}
+                onLogin={onLogin}
+                onLogout={onLogout}
+                onViewProfile={onViewProfile}
+              />
+            )}
+          </div>
         </div>
 
         {/* Level badge + Avatar */}
@@ -108,14 +116,14 @@ export function HomeScreen({
         {/* Name input */}
         <div className="w-full">
           <label className="font-body font-semibold text-sky-700 text-sm mb-1.5 block">
-            Your Name 你的名字
+            {t('game.yourName')} {showBoth && t('game.yourNameZh')}
           </label>
           <input
             type="text"
             value={name}
             onChange={(e) => setName(e.target.value)}
             maxLength={12}
-            placeholder="Type your name..."
+            placeholder={t('game.typeName')}
             className="w-full h-14 rounded-2xl bg-white border-2 border-sky-200 px-5 font-display font-semibold text-lg text-sky-800 placeholder:text-sky-300 focus:outline-none focus:border-sky-400 transition-colors"
           />
         </div>
@@ -133,7 +141,7 @@ export function HomeScreen({
           className="w-full h-16 rounded-2xl bg-gradient-to-r from-mint-400 to-mint-500 text-white font-display font-bold text-2xl shadow-lg active:scale-95 transition-all duration-150 flex items-center justify-center gap-3 hover:shadow-xl"
         >
           <Play className="w-7 h-7 fill-white" />
-          Play 開始
+          {t('common.play')} {showBoth && t('common.playZh')}
         </button>
 
         {/* Leaderboard + Badges buttons */}
@@ -143,14 +151,14 @@ export function HomeScreen({
             className="flex-1 h-14 rounded-2xl bg-white text-sun-600 font-display font-bold text-lg shadow-md active:scale-95 transition-all duration-150 flex items-center justify-center gap-2 border-2 border-sun-200 hover:bg-sun-50"
           >
             <Trophy className="w-5 h-5" />
-            Rankings
+            {t('common.rankings')}
           </button>
           <button
             onClick={onBadges}
             className="flex-1 h-14 rounded-2xl bg-white text-grape-600 font-display font-bold text-lg shadow-md active:scale-95 transition-all duration-150 flex items-center justify-center gap-2 border-2 border-grape-200 hover:bg-grape-50"
           >
             <Award className="w-5 h-5" />
-            Badges
+            {t('common.badges')}
             {earnedBadges > 0 && (
               <span className="bg-grape-400 text-white text-xs font-bold rounded-full px-2 py-0.5">
                 {earnedBadges}
@@ -161,7 +169,7 @@ export function HomeScreen({
 
         <div className="text-center text-sky-500/60 text-sm font-body">
           <Cat className="w-4 h-4 inline mr-1" />
-          For Hong Kong Math Whizzes
+          {t('game.subtitle')}
         </div>
 
         <PoweredByFooter />

@@ -3,6 +3,7 @@ import { X, Flame, Zap } from 'lucide-react';
 import { CircularTimer } from '@/components/CircularTimer';
 import { NumberPad } from '@/components/NumberPad';
 import { AvatarDisplay } from '@/components/Avatar';
+import { useTranslation } from '@/i18n';
 import {
   STAGES,
   DIFFICULTIES,
@@ -40,6 +41,7 @@ export function GameScreen({
   onQuit,
   onComplete,
 }: GameScreenProps) {
+  const { t, showBoth } = useTranslation();
   const stage = STAGES.find((s) => s.id === stageId)!;
   const diff = DIFFICULTIES.find((d) => d.id === difficulty)!;
 
@@ -224,7 +226,7 @@ export function GameScreen({
                 {score}
               </span>
               <span className="font-body font-semibold text-sky-400 text-[10px] leading-tight">
-                score
+                {t('game.score')}
               </span>
             </div>
           </div>
@@ -325,7 +327,7 @@ export function GameScreen({
         {feedback === 'none' && (
           <div className="text-center">
             <p className="font-body font-semibold text-sky-600 text-base">
-              Type your answer 輸入答案
+              Type your answer {showBoth && '輸入答案'}
             </p>
           </div>
         )}

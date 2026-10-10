@@ -3,6 +3,8 @@ import { StarRating } from '@/components/StarRating';
 import { AvatarDisplay } from '@/components/Avatar';
 import { LevelBadge } from '@/components/LevelBadge';
 import { PoweredByFooter } from '@/components/PoweredByFooter';
+import { LanguageSwitcher } from '@/components/LanguageSwitcher';
+import { useTranslation } from '@/i18n';
 import { STAGES, DIFFICULTIES, BADGES, levelFromXp, getLevelTitle } from '@/game';
 import type { RoundResult } from '@/types';
 
@@ -37,15 +39,16 @@ export function ResultsScreen({
   onHome,
   onLeaderboard,
 }: ResultsScreenProps) {
+  const { t, showBoth } = useTranslation();
   const stage = STAGES.find((s) => s.id === result.stageId)!;
   const diff = DIFFICULTIES.find((d) => d.id === result.difficulty)!;
   const accuracy = Math.round((result.correct / result.total) * 100);
 
   const titleMap: Record<number, { en: string; zh: string }> = {
-    3: { en: 'Perfect!', zh: '太厲害了！' },
-    2: { en: 'Great Work!', zh: '做得好好！' },
-    1: { en: 'Good Try!', zh: '不錯呀！' },
-    0: { en: 'Keep Practicing!', zh: '繼續努力！' },
+    3: { en: t('results.perfect'), zh: t('results.perfectZh') },
+    2: { en: t('results.great'), zh: t('results.greatZh') },
+    1: { en: t('results.good'), zh: t('results.goodZh') },
+    0: { en: t('results.practice'), zh: t('results.practiceZh') },
   };
   const title = titleMap[result.stars] ?? titleMap[0];
 
@@ -63,10 +66,10 @@ export function ResultsScreen({
         {leveledUp && (
           <div className="w-full bg-gradient-to-r from-grape-400 to-grape-600 rounded-2xl py-3 px-4 text-center shadow-lg animate-bounce-in">
             <p className="font-display font-extrabold text-white text-xl">
-              LEVEL UP! 升級了！
+              {t('results.levelUp')} {showBoth && t('results.levelUpZh')}
             </p>
             <p className="font-display font-bold text-white/90 text-base">
-              Level {newLevel} · {levelTitle.en} {levelTitle.zh}
+              Level {newLevel} · {levelTitle.en} {showBoth && levelTitle.zh}
             </p>
           </div>
         )}
@@ -74,7 +77,7 @@ export function ResultsScreen({
         {/* Title */}
         <div className="text-center">
           <h2 className="font-display font-extrabold text-3xl text-sky-700">{title.en}</h2>
-          <p className="font-display font-semibold text-2xl text-sun-500">{title.zh}</p>
+          {showBoth && <p className="font-display font-semibold text-2xl text-sun-500">{title.zh}</p>}
         </div>
 
         {/* Stars */}
@@ -96,10 +99,10 @@ export function ResultsScreen({
           </div>
 
           <div className="grid grid-cols-2 gap-3">
-            <StatBox label="Score" labelZh="分數" value={result.score} color="sky" />
-            <StatBox label="Correct" labelZh="答對" value={`${result.correct}/${result.total}`} color="mint" />
-            <StatBox label="Accuracy" labelZh="正確率" value={`${accuracy}%`} color="sun" />
-            <StatBox label="Best Streak" labelZh="最高連擊" value={result.maxStreak} color="coral" />
+            <StatBox label={t('game.score')} labelZh={showBoth ? '分數' : ''} value={result.score} color="sky" />
+            <StatBox label={t('game.correct')} labelZh={showBoth ? '答對' : ''} value={`${result.correct}/${result.total}`} color="mint" />
+            <StatBox label={t('game.accuracy')} labelZh={showBoth ? '正確率' : ''} value={`${accuracy}%`} color="sun" />
+            <StatBox label={t('game.bestStreak')} labelZh={showBoth ? '最高連擊' : ''} value={result.maxStreak} color="coral" />
           </div>
 
           {/* XP earned */}
@@ -128,7 +131,7 @@ export function ResultsScreen({
           {isNewHighScore && (
             <div className="bg-sun-100 rounded-2xl py-2.5 text-center animate-wiggle">
               <span className="font-display font-bold text-sun-600">
-                New High Score! 新紀錄！
+                {t('results.newHighScore')} {showBoth && t('results.newHighScoreZh')}
               </span>
             </div>
           )}
@@ -140,7 +143,7 @@ export function ResultsScreen({
             <div className="flex items-center gap-2 mb-3">
               <Award className="w-5 h-5 text-grape-500" />
               <span className="font-display font-bold text-grape-600 text-base">
-                New Badges! 新徽章！
+                {t('results.newBadges')} {showBoth && t('results.newBadgesZh')}
               </span>
             </div>
             <div className="flex flex-wrap gap-3">
@@ -167,7 +170,7 @@ export function ResultsScreen({
               onClick={onNext}
               className="w-full h-16 rounded-2xl bg-gradient-to-r from-mint-400 to-mint-500 text-white font-display font-bold text-xl shadow-lg active:scale-95 transition-all flex items-center justify-center gap-2"
             >
-              Next Stage 下一關
+              {t('common.next')} {showBoth && t('common.nextZh')}
               <ChevronRight className="w-6 h-6" />
             </button>
           )}
@@ -178,14 +181,14 @@ export function ResultsScreen({
               className="flex-1 h-14 rounded-2xl bg-white text-sky-600 font-display font-bold text-lg shadow-md active:scale-95 transition-all flex items-center justify-center gap-2 border-2 border-sky-200"
             >
               <RotateCcw className="w-5 h-5" />
-              Retry
+              {t('common.retry')}
             </button>
             <button
               onClick={onLeaderboard}
               className="flex-1 h-14 rounded-2xl bg-white text-sun-600 font-display font-bold text-lg shadow-md active:scale-95 transition-all flex items-center justify-center gap-2 border-2 border-sun-200"
             >
               <Trophy className="w-5 h-5" />
-              Rankings
+              {t('common.rankings')}
             </button>
           </div>
 
@@ -194,7 +197,7 @@ export function ResultsScreen({
             className="w-full h-12 rounded-2xl bg-sky-50 text-sky-500 font-display font-semibold text-base active:scale-95 transition-all flex items-center justify-center gap-2"
           >
             <Home className="w-5 h-5" />
-            Home 首頁
+            {t('common.home')} {showBoth && t('common.homeZh')}
           </button>
         </div>
 
