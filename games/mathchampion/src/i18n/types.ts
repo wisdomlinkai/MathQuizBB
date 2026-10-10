@@ -109,6 +109,20 @@ export interface TranslationStrings {
 }
 
 export interface Translations {
+  auth: {
+    signIn: string;
+    signInZh: string;
+    signInHint: string;
+    signInHintZh: string;
+    user: string;
+    userZh: string;
+    viewProfile: string;
+    viewProfileZh: string;
+    logout: string;
+    logoutZh: string;
+    signInToSave: string;
+    signInToSaveZh: string;
+  };
   daily: {
     challenge: string;
     challengeZh: string;

@@ -1,6 +1,20 @@
 import type { Translations } from './types';
 
 export const zhHK: Translations = {
+  auth: {
+    signIn: '登入',
+    signInZh: '登入',
+    signInHint: '登入以保存進度',
+    signInHintZh: '登入以保存進度',
+    user: '用戶',
+    userZh: '用戶',
+    viewProfile: '查看資料',
+    viewProfileZh: '查看資料',
+    logout: '登出',
+    logoutZh: '登出',
+    signInToSave: '登入以保存',
+    signInToSaveZh: '登入以保存',
+  },
   daily: {
     challenge: '每日挑戰',
     challengeZh: '每日挑戰',

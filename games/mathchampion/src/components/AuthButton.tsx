@@ -1,5 +1,6 @@
 import { LogIn, UserCircle, ChevronDown } from 'lucide-react';
 import { useState, useRef, useEffect } from 'react';
+import { useTranslation } from '@/i18n';
 import type { User } from '@/types';
 
 interface AuthButtonProps {
@@ -17,6 +18,7 @@ export function AuthButton({
   onLogout,
   onViewProfile 
 }: AuthButtonProps) {
+  const { t } = useTranslation();
   const [showDropdown, setShowDropdown] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
@@ -43,10 +45,10 @@ export function AuthButton({
       <button
         onClick={onLogin}
         className="flex items-center gap-2 bg-gradient-to-r from-sky-500 to-sky-600 text-white rounded-xl px-4 py-2 shadow-md active:scale-95 transition-transform hover:shadow-lg"
-        title="Sign in to save your progress"
+        title={t('auth.signInHint')}
       >
         <LogIn className="w-4 h-4" />
-        <span className="font-display font-bold text-sm">Sign In</span>
+        <span className="font-display font-bold text-sm">{t('auth.signIn')}</span>
       </button>
     );
   }
@@ -60,7 +62,7 @@ export function AuthButton({
       >
         <UserCircle className="w-7 h-7 text-sky-600" />
         <span className="font-display font-bold text-sky-700 text-sm max-w-[60px] truncate">
-          {user?.name || 'User'}
+          {user?.name || t('auth.user')}
         </span>
         <ChevronDown className={`w-4 h-4 text-sky-400 transition-transform ${showDropdown ? 'rotate-180' : ''}`} />
       </button>
@@ -75,7 +77,7 @@ export function AuthButton({
               }}
               className="w-full px-4 py-2 text-left font-body font-semibold text-sky-700 hover:bg-sky-50 text-sm"
             >
-              View Profile
+              {t('auth.viewProfile')}
             </button>
           )}
           <hr className="my-1 border-sky-100" />
@@ -86,7 +88,7 @@ export function AuthButton({
             }}
             className="w-full px-4 py-2 text-left font-body font-semibold text-coral-600 hover:bg-coral-50 text-sm"
           >
-            Logout
+            {t('auth.logout')}
           </button>
         </div>
       )}
@@ -96,13 +98,14 @@ export function AuthButton({
 
 // Guest user indicator (shown on game screens)
 export function GuestIndicator({ onLogin }: { onLogin: () => void }) {
+  const { t } = useTranslation();
   return (
     <button
       onClick={onLogin}
       className="flex items-center gap-2 bg-gradient-to-r from-sky-100 to-sky-50 rounded-xl px-3 py-1.5 shadow-sm active:scale-95 transition-transform hover:shadow-md border border-sky-200"
     >
       <LogIn className="w-4 h-4 text-sky-600" />
-      <span className="font-body font-semibold text-sky-700 text-xs">Sign in to save</span>
+      <span className="font-body font-semibold text-sky-700 text-xs">{t('auth.signInToSave')}</span>
     </button>
   );
 }
