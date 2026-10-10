@@ -253,4 +253,20 @@ export interface Translations {
     beginner: string;
     beginnerZh: string;
   };
+  leaderboard: {
+    title: string;
+    titleZh: string;
+    signUpPrompt: string;
+    signUpPromptZh: string;
+    competeText: string;
+    competeTextZh: string;
+    noScores: string;
+    noScoresZh: string;
+    playToGetOnBoard: string;
+    playToGetOnBoardZh: string;
+    signUpToView: string;
+    signUpToViewZh: string;
+    you: string;
+    youZh: string;
+  };
 }

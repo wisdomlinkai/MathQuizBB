@@ -19,17 +19,34 @@ interface I18nContextType {
 const I18nContext = createContext<I18nContextType | undefined>(undefined);
 
 export function I18nProvider({ children, defaultLanguage = 'en' }: { children: ReactNode; defaultLanguage?: Language }) {
-  const [language, setLanguage] = useState<Language>(defaultLanguage);
+  const [language, setLanguage] = useState<Language>(() => {
+    // Initialize from localStorage or use default
+    if (typeof window !== 'undefined') {
+      const saved = localStorage.getItem('math-champions-language');
+      if (saved === 'en' || saved === 'zh-HK') {
+        return saved;
+      }
+    }
+    return defaultLanguage;
+  });
+
+  // Save language preference when it changes
+  const handleSetLanguage = (lang: Language) => {
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('math-champions-language', lang);
+    }
+    setLanguage(lang);
+  };
 
   const t = (key: string): string => {
     const keys = key.split('.');
-    let value: any = translations[language];
+    let value: unknown = translations[language];
     
     for (const k of keys) {
       if (value && typeof value === 'object' && k in value) {
-        value = value[k];
+        value = (value as Record<string, unknown>)[k];
       } else {
-        console.warn(`Translation key not found: ${key}`);
+        // Key not found, return the key itself
         return key;
       }
     }
@@ -41,7 +58,7 @@ export function I18nProvider({ children, defaultLanguage = 'en' }: { children: R
     <I18nContext.Provider value={{ 
       t, 
       language, 
-      setLanguage
+      setLanguage: handleSetLanguage
     }}>
       {children}
     </I18nContext.Provider>
